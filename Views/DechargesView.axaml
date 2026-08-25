@@ -1,0 +1,208 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:EquipmentDechargeManager.ViewModels"
+             xmlns:loc="clr-namespace:EquipmentDechargeManager.Services"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
+             x:Class="EquipmentDechargeManager.Views.DechargesView"
+             x:DataType="vm:DechargesViewModel">
+
+    <Grid RowDefinitions="Auto, Auto, *">
+        
+        <!-- Header View Tabs Bar -->
+        <Border Grid.Row="0" Margin="24,20,24,16">
+            <StackPanel Orientation="Horizontal" Spacing="24">
+                <!-- Active Tab: Liste des décharges -->
+                <Button Command="{Binding CancelCreateFormCommand}" Background="Transparent" Padding="0,0,0,8" CornerRadius="0">
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="Liste des décharges" FontSize="16" FontWeight="Bold" Foreground="#2563EB"/>
+                        <Border Height="2" Background="#2563EB"/>
+                    </StackPanel>
+                </Button>
+
+                <!-- Tab: Nouvelle décharge -->
+                <Button Command="{Binding OpenCreateFormCommand}" Background="Transparent" Padding="0,0,0,8" CornerRadius="0">
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="Nouvelle décharge" FontSize="16" FontWeight="Medium" Foreground="#64748B"/>
+                        <Border Height="2" Background="Transparent"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Border>
+
+        <!-- Main Content Area -->
+        <Grid Grid.Row="2" Margin="24,0,24,24" ColumnDefinitions="*, Auto">
+            
+            <!-- Left Side: Search + Decharge List Table -->
+            <StackPanel Grid.Column="0" Spacing="16">
+                <!-- Search & Refresh Toolbar -->
+                <Grid ColumnDefinitions="*, Auto">
+                    <TextBox Grid.Column="0" Text="{Binding SearchText, Mode=TwoWay}" 
+                             PlaceholderText="{Binding Loc[Dec_SearchPlaceholder]}" 
+                             Padding="12,9" CornerRadius="6" Margin="0,0,10,0"/>
+                    <Button Grid.Column="1" Command="{Binding LoadDechargesCommand}" 
+                            Classes="outline">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="🔄" FontSize="12"/>
+                            <TextBlock Text="Actualiser"/>
+                        </StackPanel>
+                    </Button>
+                </Grid>
+
+                <!-- Table Container -->
+                <Border Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="16">
+                    <Grid RowDefinitions="Auto, *">
+                        
+                        <!-- Table Header -->
+                        <Border Grid.Row="0" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1" Padding="12,8" CornerRadius="4">
+                            <Grid ColumnDefinitions="1.5*, 2*, 1.2*, 1*, 1.5*, Auto">
+                                <TextBlock Grid.Column="0" Text="{Binding Loc[Dec_Number]}" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
+                                <TextBlock Grid.Column="1" Text="{Binding Loc[Dec_Employee]}" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
+                                <TextBlock Grid.Column="2" Text="{Binding Loc[Dec_IssueDate]}" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
+                                <TextBlock Grid.Column="3" Text="{Binding Loc[Dec_Items]}" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
+                                <TextBlock Grid.Column="4" Text="{Binding Loc[Dec_Status]}" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
+                                <TextBlock Grid.Column="5" Text="{Binding Loc[Common_Actions]}" FontSize="11" FontWeight="Bold" Foreground="#64748B" Width="50" TextAlignment="Center"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- Table Rows -->
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding Decharges}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="#F1F5F9" BorderThickness="0,0,0,1" Padding="12,10">
+                                            <Grid ColumnDefinitions="1.5*, 2*, 1.2*, 1*, 1.5*, Auto">
+                                                <TextBlock Grid.Column="0" Text="{Binding DechargeNumber}" FontWeight="SemiBold" FontSize="12" Foreground="#0F172A" VerticalAlignment="Center"/>
+                                                <TextBlock Grid.Column="1" Text="{Binding EmployeeName}" FontSize="12" Foreground="#334155" VerticalAlignment="Center"/>
+                                                <TextBlock Grid.Column="2" Text="{Binding IssueDate, StringFormat=\{0:dd/MM/yyyy\}}" FontSize="12" Foreground="#64748B" VerticalAlignment="Center"/>
+                                                <TextBlock Grid.Column="3" Text="{Binding ItemCount}" FontSize="12" Foreground="#334155" VerticalAlignment="Center"/>
+                                                
+                                                <!-- Status Badge Pill -->
+                                                <Border Grid.Column="4" HorizontalAlignment="Left" Padding="10,4" CornerRadius="12"
+                                                        Background="{Binding StatusBgColor}">
+                                                    <TextBlock Text="{Binding StatusText}" FontSize="11" FontWeight="SemiBold"
+                                                               Foreground="{Binding StatusFgColor}"/>
+                                                </Border>
+
+                                                <!-- Action Eye Icon Button -->
+                                                <Button Grid.Column="5" Classes="icon-view" 
+                                                        Command="{Binding $parent[UserControl].((vm:DechargesViewModel)DataContext).ViewDetailsCommand}" 
+                                                        CommandParameter="{Binding}" Width="36" HorizontalAlignment="Center" ToolTip.Tip="Détails">
+                                                    <TextBlock Text="👁️" FontSize="12"/>
+                                                </Button>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+            </StackPanel>
+
+            <!-- Creation Side Panel ("Nouvelle décharge") -->
+            <Border Grid.Column="1" Width="380" Margin="16,0,0,0" 
+                    Background="White" BorderBrush="#E2E8F0" BorderThickness="1" 
+                    CornerRadius="8" Padding="20" 
+                    IsVisible="{Binding IsCreateFormOpen}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Spacing="14">
+                        <TextBlock Text="Nouvelle décharge" FontSize="16" FontWeight="Bold" Foreground="#0F172A"/>
+
+                        <!-- Error Banner -->
+                        <Border Background="#FEE2E2" BorderBrush="#EF4444" BorderThickness="1" 
+                                CornerRadius="4" Padding="8" 
+                                IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                            <TextBlock Text="{Binding ErrorMessage}" Foreground="#991B1B" FontSize="12" TextWrapping="Wrap"/>
+                        </Border>
+
+                        <!-- Decharge Number -->
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="{Binding Loc[Dec_Number]}" FontSize="12" FontWeight="SemiBold" Foreground="#334155"/>
+                            <TextBox Text="{Binding DechargeNumber, Mode=TwoWay}" CornerRadius="4"/>
+                        </StackPanel>
+
+                        <!-- Select Employee -->
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Employé *" FontSize="12" FontWeight="SemiBold" Foreground="#334155"/>
+                            <ComboBox ItemsSource="{Binding EmployeesList}" 
+                                      SelectedItem="{Binding SelectedEmployee, Mode=TwoWay}" 
+                                      HorizontalAlignment="Stretch" CornerRadius="4">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding FullName}"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <!-- Date Picker -->
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Date *" FontSize="12" FontWeight="SemiBold" Foreground="#334155"/>
+                            <DatePicker HorizontalAlignment="Stretch"/>
+                        </StackPanel>
+
+                        <!-- Notes -->
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Notes (optionnel)" FontSize="12" FontWeight="SemiBold" Foreground="#334155"/>
+                            <TextBox Text="{Binding Notes, Mode=TwoWay}" Height="50" AcceptsReturn="True" CornerRadius="4"/>
+                        </StackPanel>
+
+                        <!-- Add Equipment Section -->
+                        <StackPanel Spacing="8" Margin="0,4,0,0">
+                            <TextBlock Text="Articles" FontSize="13" FontWeight="Bold" Foreground="#0F172A"/>
+                            <TextBlock Text="Ajouter un équipement" FontSize="11" Foreground="#64748B"/>
+
+                            <Grid ColumnDefinitions="*, Auto">
+                                <ComboBox Grid.Column="0" ItemsSource="{Binding AvailableEquipmentsList}" 
+                                          SelectedItem="{Binding SelectedEquipmentToAdd, Mode=TwoWay}" 
+                                          HorizontalAlignment="Stretch" CornerRadius="4" Margin="0,0,8,0">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Type}"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                                <Button Grid.Column="1" Content="Ajouter" 
+                                        Command="{Binding AddItemToDechargeCommand}" 
+                                        Classes="accent" Padding="12,6"/>
+                            </Grid>
+
+                            <!-- Items Container -->
+                            <Border Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="6" MinHeight="60" Padding="8">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                    <ItemsControl ItemsSource="{Binding NewDechargeItems}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border BorderBrush="#E2E8F0" BorderThickness="0,0,0,1" Padding="6,4">
+                                                    <Grid ColumnDefinitions="*, Auto">
+                                                        <StackPanel Grid.Column="0" Spacing="2">
+                                                            <TextBlock Text="{Binding Equipment.Type}" FontWeight="SemiBold" FontSize="12"/>
+                                                            <TextBlock Text="{Binding Equipment.SerialNumber}" FontSize="11" Foreground="#64748B"/>
+                                                        </StackPanel>
+                                                        <Button Grid.Column="1" Content="✕" 
+                                                                Command="{Binding $parent[UserControl].((vm:DechargesViewModel)DataContext).RemoveItemFromDechargeCommand}" 
+                                                                CommandParameter="{Binding}" 
+                                                                Foreground="#EF4444" Padding="6,2" CornerRadius="4"/>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                            </Border>
+                        </StackPanel>
+
+                        <!-- Action Buttons -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,12,0,0">
+                            <Button Content="Réinitialiser" Command="{Binding CancelCreateFormCommand}" Classes="outline"/>
+                            <Button Content="Enregistrer" Command="{Binding SaveDechargeCommand}" Classes="accent"/>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+        </Grid>
+    </Grid>
+</UserControl>

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-system-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="0" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <data name="App_Title" xml:space="preserve"><value>Gestionnaire de Décharge d'Équipement</value></data>
+  <data name="Nav_Dashboard" xml:space="preserve"><value>Tableau de bord</value></data>
+  <data name="Nav_Employees" xml:space="preserve"><value>Employés</value></data>
+  <data name="Nav_Equipment" xml:space="preserve"><value>Équipements</value></data>
+  <data name="Nav_Decharges" xml:space="preserve"><value>Décharges</value></data>
+  <data name="Nav_DechargeDetails" xml:space="preserve"><value>Détails décharge</value></data>
+  <data name="Nav_Settings" xml:space="preserve"><value>Paramètres</value></data>
+  
+  <data name="Common_Save" xml:space="preserve"><value>Enregistrer</value></data>
+  <data name="Common_Cancel" xml:space="preserve"><value>Annuler</value></data>
+  <data name="Common_Delete" xml:space="preserve"><value>Supprimer</value></data>
+  <data name="Common_Edit" xml:space="preserve"><value>Modifier</value></data>
+  <data name="Common_Add" xml:space="preserve"><value>Ajouter</value></data>
+  <data name="Common_Search" xml:space="preserve"><value>Rechercher</value></data>
+  <data name="Common_Actions" xml:space="preserve"><value>Actions</value></data>
+  <data name="Common_Filter" xml:space="preserve"><value>Filtrer</value></data>
+  <data name="Common_Status" xml:space="preserve"><value>Statut</value></data>
+  <data name="Common_Notes" xml:space="preserve"><value>Remarques / Notes</value></data>
+  <data name="Common_Required" xml:space="preserve"><value>Champ obligatoire</value></data>
+  <data name="Common_Yes" xml:space="preserve"><value>Oui</value></data>
+  <data name="Common_No" xml:space="preserve"><value>Non</value></data>
+  <data name="Common_Close" xml:space="preserve"><value>Fermer</value></data>
+  <data name="Common_View" xml:space="preserve"><value>Consulter</value></data>
+
+  <data name="Dashboard_Title" xml:space="preserve"><value>Tableau de bord</value></data>
+  <data name="Dashboard_TotalEquipment" xml:space="preserve"><value>Total Équipements</value></data>
+  <data name="Dashboard_TotalEmployees" xml:space="preserve"><value>Total Employés</value></data>
+  <data name="Dashboard_TotalDecharges" xml:space="preserve"><value>Total Décharges</value></data>
+  <data name="Dashboard_ActiveItems" xml:space="preserve"><value>Articles Actifs</value></data>
+  <data name="Dashboard_EquipmentBreakdown" xml:space="preserve"><value>Répartition par Statut</value></data>
+  <data name="Dashboard_RecentDecharges" xml:space="preserve"><value>5 dernières décharges</value></data>
+
+  <data name="Emp_Title" xml:space="preserve"><value>Employés</value></data>
+  <data name="Emp_FullName" xml:space="preserve"><value>Nom complet</value></data>
+  <data name="Emp_Matricule" xml:space="preserve"><value>Matricule</value></data>
+  <data name="Emp_Function" xml:space="preserve"><value>Fonction</value></data>
+  <data name="Emp_Structure" xml:space="preserve"><value>Structure</value></data>
+  <data name="Emp_Region" xml:space="preserve"><value>Région</value></data>
+  <data name="Emp_AddTitle" xml:space="preserve"><value>Ajouter un employé</value></data>
+  <data name="Emp_EditTitle" xml:space="preserve"><value>Modifier l'employé</value></data>
+  <data name="Emp_SearchPlaceholder" xml:space="preserve"><value>Rechercher par nom ou matricule...</value></data>
+  <data name="Emp_ConfirmDelete" xml:space="preserve"><value>Êtes-vous sûr de vouloir supprimer cet employé ?</value></data>
+  <data name="Emp_ErrorMatriculeExists" xml:space="preserve"><value>Ce matricule existe déjà.</value></data>
+
+  <data name="Eq_Title" xml:space="preserve"><value>Équipements</value></data>
+  <data name="Eq_Type" xml:space="preserve"><value>Type</value></data>
+  <data name="Eq_Brand" xml:space="preserve"><value>Marque</value></data>
+  <data name="Eq_Model" xml:space="preserve"><value>Modèle</value></data>
+  <data name="Eq_SerialNumber" xml:space="preserve"><value>N° Série</value></data>
+  <data name="Eq_InventoryNumber" xml:space="preserve"><value>N° Inventaire</value></data>
+  <data name="Eq_ShCode" xml:space="preserve"><value>Code SH</value></data>
+  <data name="Eq_Status" xml:space="preserve"><value>Statut</value></data>
+  <data name="Eq_AddTitle" xml:space="preserve"><value>Ajouter un équipement</value></data>
+  <data name="Eq_EditTitle" xml:space="preserve"><value>Modifier l'équipement</value></data>
+  <data name="Eq_SearchPlaceholder" xml:space="preserve"><value>Rechercher par type, marque, modèle, n° inventaire...</value></data>
+  <data name="Eq_FilterStatus" xml:space="preserve"><value>Tous les statuts</value></data>
+
+  <data name="Status_Available" xml:space="preserve"><value>Disponibles</value></data>
+  <data name="Status_Assigned" xml:space="preserve"><value>Assignés</value></data>
+  <data name="Status_Returned" xml:space="preserve"><value>Retournés</value></data>
+  <data name="Status_Damaged" xml:space="preserve"><value>Endommagés</value></data>
+  <data name="Status_Lost" xml:space="preserve"><value>Perdus</value></data>
+  <data name="Status_Retired" xml:space="preserve"><value>Mis au rebut</value></data>
+
+  <data name="Dec_Title" xml:space="preserve"><value>Décharges</value></data>
+  <data name="Dec_Number" xml:space="preserve"><value>N° Décharge</value></data>
+  <data name="Dec_Employee" xml:space="preserve"><value>Employé</value></data>
+  <data name="Dec_IssueDate" xml:space="preserve"><value>Date</value></data>
+  <data name="Dec_ItemCount" xml:space="preserve"><value>Articles</value></data>
+  <data name="Dec_CreateNew" xml:space="preserve"><value>Nouvelle décharge</value></data>
+  <data name="Dec_SelectEmployee" xml:space="preserve"><value>Sélectionner un employé</value></data>
+  <data name="Dec_SelectEquipment" xml:space="preserve"><value>Sélectionner un équipement disponible</value></data>
+  <data name="Dec_ConditionAtAssignment" xml:space="preserve"><value>État à l'attribution</value></data>
+  <data name="Dec_AddItem" xml:space="preserve"><value>Ajouter</value></data>
+  <data name="Dec_SearchPlaceholder" xml:space="preserve"><value>Rechercher par n° décharge ou employé...</value></data>
+
+  <data name="DecDet_Title" xml:space="preserve"><value>Détails décharge</value></data>
+  <data name="DecDet_ItemsList" xml:space="preserve"><value>Articles de la décharge</value></data>
+  <data name="DecDet_ReturnAction" xml:space="preserve"><value>Enregistrer le retour</value></data>
+  <data name="DecDet_ReturnDate" xml:space="preserve"><value>Date de retour</value></data>
+  <data name="DecDet_ReturnCondition" xml:space="preserve"><value>État à la restitution</value></data>
+  <data name="DecDet_AlreadyReturned" xml:space="preserve"><value>Restitué</value></data>
+  <data name="DecDet_ConfirmReturn" xml:space="preserve"><value>Enregistrer</value></data>
+  <data name="DecDet_Back" xml:space="preserve"><value>Retour</value></data>
+  <data name="DecDet_ReturnNotes" xml:space="preserve"><value>Notes</value></data>
+</root>

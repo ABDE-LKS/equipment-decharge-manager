@@ -1,0 +1,133 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:EquipmentDechargeManager.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:loc="clr-namespace:EquipmentDechargeManager.Services"
+        mc:Ignorable="d" d:DesignWidth="1440" d:DesignHeight="900"
+        x:Class="EquipmentDechargeManager.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="Equipment Decharge Manager"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized"
+        Width="1440" Height="900" MinWidth="1100" MinHeight="700">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Grid ColumnDefinitions="220, *">
+        
+        <!-- Sidebar Navigation -->
+        <Border Grid.Column="0" Background="#1A2238" Padding="12,16">
+            <Grid RowDefinitions="Auto, *">
+                
+                <!-- Nav Menu Items -->
+                <StackPanel Grid.Row="1" Spacing="6" Margin="0,12,0,0">
+                    <!-- Dashboard -->
+                    <Button Command="{Binding NavigateDashboardCommand}" 
+                            HorizontalAlignment="Stretch" 
+                            HorizontalContentAlignment="Left"
+                            Padding="12,10" CornerRadius="6" 
+                            Background="#2B3654" Foreground="White" FontWeight="SemiBold">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Text="🏠" FontSize="14"/>
+                            <TextBlock Text="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[Nav_Dashboard]}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Employees -->
+                    <Button Command="{Binding NavigateEmployeesCommand}" 
+                            HorizontalAlignment="Stretch" 
+                            HorizontalContentAlignment="Left"
+                            Padding="12,10" CornerRadius="6" 
+                            Background="Transparent" Foreground="#94A3B8" FontWeight="Medium">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Text="👤" FontSize="14"/>
+                            <TextBlock Text="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[Nav_Employees]}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Equipment -->
+                    <Button Command="{Binding NavigateEquipmentCommand}" 
+                            HorizontalAlignment="Stretch" 
+                            HorizontalContentAlignment="Left"
+                            Padding="12,10" CornerRadius="6" 
+                            Background="Transparent" Foreground="#94A3B8" FontWeight="Medium">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Text="💻" FontSize="14"/>
+                            <TextBlock Text="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[Nav_Equipment]}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Decharges -->
+                    <Button Command="{Binding NavigateDechargesCommand}" 
+                            HorizontalAlignment="Stretch" 
+                            HorizontalContentAlignment="Left"
+                            Padding="12,10" CornerRadius="6" 
+                            Background="Transparent" Foreground="#94A3B8" FontWeight="Medium">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Text="📋" FontSize="14"/>
+                            <TextBlock Text="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[Nav_Decharges]}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Details Decharge -->
+                    <Button Command="{Binding NavigateDechargesCommand}" 
+                            HorizontalAlignment="Stretch" 
+                            HorizontalContentAlignment="Left"
+                            Padding="12,10" CornerRadius="6" 
+                            Background="Transparent" Foreground="#94A3B8" FontWeight="Medium">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Text="📄" FontSize="14"/>
+                            <TextBlock Text="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[Nav_DechargeDetails]}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Settings / Paramètres -->
+                    <Button Command="{Binding NavigateSettingsCommand}" 
+                            HorizontalAlignment="Stretch" 
+                            HorizontalContentAlignment="Left"
+                            Padding="12,10" CornerRadius="6" 
+                            Background="Transparent" Foreground="#94A3B8" FontWeight="Medium">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Text="⚙️" FontSize="14"/>
+                            <TextBlock Text="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[Nav_Settings]}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+
+            </Grid>
+        </Border>
+
+        <!-- Right Content Area (Header + Main View Host) -->
+        <Grid Grid.Column="1" RowDefinitions="Auto, *">
+            
+            <!-- Top Header Bar -->
+            <Border Grid.Row="0" Background="White" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1" Padding="24,12">
+                <DockPanel>
+                    <!-- App Title -->
+                    <TextBlock Text="Equipment Decharge Manager" 
+                               FontSize="16" FontWeight="Bold" Foreground="#0F172A"
+                               DockPanel.Dock="Left" VerticalAlignment="Center"/>
+                    
+                    <!-- Language Indicator (100% French) -->
+                    <Border DockPanel.Dock="Right" HorizontalAlignment="Right" Background="#F1F5F9" Padding="10,4" CornerRadius="4">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <TextBlock Text="FR" FontWeight="Bold" Foreground="#2563EB" FontSize="12"/>
+                            <TextBlock Text=" ∨" FontSize="10" Foreground="#64748B" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </DockPanel>
+            </Border>
+
+            <!-- Main Workspace View Host -->
+            <Border Grid.Row="1" Background="#F8FAFC">
+                <TransitioningContentControl Content="{Binding CurrentView}"/>
+            </Border>
+
+        </Grid>
+
+    </Grid>
+</Window>

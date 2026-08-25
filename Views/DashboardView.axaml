@@ -1,0 +1,160 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:EquipmentDechargeManager.ViewModels"
+             xmlns:loc="clr-namespace:EquipmentDechargeManager.Services"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
+             x:Class="EquipmentDechargeManager.Views.DashboardView"
+             x:DataType="vm:DashboardViewModel">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="20" Margin="24">
+            
+            <!-- Page Title -->
+            <TextBlock Text="{Binding Loc[Dashboard_Title]}" 
+                       FontSize="22" FontWeight="Bold" Foreground="#0F172A"/>
+
+            <!-- Error Message if any -->
+            <Border Background="#FEE2E2" BorderBrush="#EF4444" BorderThickness="1" 
+                    CornerRadius="6" Padding="12" IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                <TextBlock Text="{Binding ErrorMessage}" Foreground="#991B1B"/>
+            </Border>
+
+            <!-- Row 1: 6 Equipment Status Counter Cards -->
+            <Grid ColumnDefinitions="*,*,*,*,*,*" Margin="0,0,0,4">
+                <!-- Total Equipment Card -->
+                <Border Grid.Column="0" Margin="0,0,8,0" Padding="14,12" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8">
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="{Binding Loc[Dashboard_TotalEquipment]}" FontSize="11" Foreground="#64748B" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding TotalEquipmentCount}" FontSize="24" FontWeight="Bold" Foreground="#0F172A"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Available -->
+                <Border Grid.Column="1" Margin="4,0,8,0" Padding="14,12" Background="#ECFDF5" BorderBrush="#A7F3D0" BorderThickness="1" CornerRadius="8">
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="{Binding Loc[Status_Available]}" FontSize="11" Foreground="#047857" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding AvailableCount}" FontSize="24" FontWeight="Bold" Foreground="#10B981"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Assigned -->
+                <Border Grid.Column="2" Margin="4,0,8,0" Padding="14,12" Background="#EFF6FF" BorderBrush="#BFDBFE" BorderThickness="1" CornerRadius="8">
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="{Binding Loc[Status_Assigned]}" FontSize="11" Foreground="#1D4ED8" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding AssignedCount}" FontSize="24" FontWeight="Bold" Foreground="#3B82F6"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Returned -->
+                <Border Grid.Column="3" Margin="4,0,8,0" Padding="14,12" Background="#F0FDFA" BorderBrush="#99F6E4" BorderThickness="1" CornerRadius="8">
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="{Binding Loc[Status_Returned]}" FontSize="11" Foreground="#0D9488" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding ReturnedCount}" FontSize="24" FontWeight="Bold" Foreground="#06B6D4"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Damaged -->
+                <Border Grid.Column="4" Margin="4,0,8,0" Padding="14,12" Background="#FFF7ED" BorderBrush="#FFEDD5" BorderThickness="1" CornerRadius="8">
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="{Binding Loc[Status_Damaged]}" FontSize="11" Foreground="#C2410C" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding DamagedCount}" FontSize="24" FontWeight="Bold" Foreground="#F97316"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Lost -->
+                <Border Grid.Column="5" Margin="4,0,0,0" Padding="14,12" Background="#FEF2F2" BorderBrush="#FECACA" BorderThickness="1" CornerRadius="8">
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="{Binding Loc[Status_Lost]}" FontSize="11" Foreground="#B91C1C" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding LostCount}" FontSize="24" FontWeight="Bold" Foreground="#EF4444"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Row 2: 3 Secondary Metric Cards -->
+            <Grid ColumnDefinitions="*,*,*" Margin="0,4,0,4">
+                <!-- Total Employees -->
+                <Border Grid.Column="0" Margin="0,0,12,0" Padding="16,14" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8">
+                    <StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
+                        <Border Background="#F1F5F9" Width="44" Height="44" CornerRadius="8" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock Text="👤" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel Spacing="2" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding Loc[Dashboard_TotalEmployees]}" FontSize="11" Foreground="#64748B" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding TotalEmployeesCount}" FontSize="22" FontWeight="Bold" Foreground="#0F172A"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Total Decharges -->
+                <Border Grid.Column="1" Margin="6,0,6,0" Padding="16,14" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8">
+                    <StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
+                        <Border Background="#F1F5F9" Width="44" Height="44" CornerRadius="8" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock Text="📄" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel Spacing="2" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding Loc[Dashboard_TotalDecharges]}" FontSize="11" Foreground="#64748B" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding TotalDechargesCount}" FontSize="22" FontWeight="Bold" Foreground="#0F172A"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Active Items -->
+                <Border Grid.Column="2" Margin="12,0,0,0" Padding="16,14" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8">
+                    <StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
+                        <Border Background="#F1F5F9" Width="44" Height="44" CornerRadius="8" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock Text="📦" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel Spacing="2" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding Loc[Dashboard_ActiveItems]}" FontSize="11" Foreground="#64748B" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding ActiveItemsCount}" FontSize="22" FontWeight="Bold" Foreground="#0F172A"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Row 3: 5 Dernières décharges Table -->
+            <Border Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="16">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="{Binding Loc[Dashboard_RecentDecharges]}" FontSize="14" FontWeight="Bold" Foreground="#0F172A"/>
+
+                    <!-- Table Header -->
+                    <Border Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1" Padding="12,8" CornerRadius="4">
+                        <Grid ColumnDefinitions="1.5*, 2*, 1.2*, 1*, 1.5*">
+                            <TextBlock Grid.Column="0" Text="{Binding Loc[Dec_Number]}" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
+                            <TextBlock Grid.Column="1" Text="{Binding Loc[Dec_Employee]}" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
+                            <TextBlock Grid.Column="2" Text="{Binding Loc[Dec_IssueDate]}" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
+                            <TextBlock Grid.Column="3" Text="{Binding Loc[Dec_Items]}" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
+                            <TextBlock Grid.Column="4" Text="{Binding Loc[Dec_Status]}" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Table Rows -->
+                    <ItemsControl ItemsSource="{Binding RecentDecharges}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="#F1F5F9" BorderThickness="0,0,0,1" Padding="12,10">
+                                    <Grid ColumnDefinitions="1.5*, 2*, 1.2*, 1*, 1.5*">
+                                        <TextBlock Grid.Column="0" Text="{Binding DechargeNumber}" FontWeight="SemiBold" FontSize="12" Foreground="#0F172A" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding EmployeeName}" FontSize="12" Foreground="#334155" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="2" Text="{Binding IssueDate, StringFormat=\{0:dd/MM/yyyy\}}" FontSize="12" Foreground="#64748B" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="3" Text="{Binding ItemCount}" FontSize="12" Foreground="#334155" VerticalAlignment="Center"/>
+                                        
+                                        <!-- Status Badge Pill -->
+                                        <Border Grid.Column="4" HorizontalAlignment="Left" Padding="10,4" CornerRadius="12"
+                                                Background="{Binding StatusBgColor}">
+                                            <TextBlock Text="{Binding StatusText}" FontSize="11" FontWeight="SemiBold"
+                                                       Foreground="{Binding StatusFgColor}"/>
+                                        </Border>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

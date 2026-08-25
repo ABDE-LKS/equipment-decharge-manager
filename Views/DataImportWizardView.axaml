@@ -1,0 +1,210 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:EquipmentDechargeManager.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
+             x:Class="EquipmentDechargeManager.Views.DataImportWizardView"
+             x:DataType="vm:DataImportWizardViewModel">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="20">
+        <StackPanel Spacing="20" MaxWidth="1100" HorizontalAlignment="Stretch">
+
+            <!-- Title -->
+            <TextBlock Text="{Binding Title}" FontSize="22" FontWeight="Bold" Foreground="#0F172A"/>
+
+            <!-- Error Banner -->
+            <Border Background="#FEE2E2" BorderBrush="#EF4444" BorderThickness="1" 
+                    CornerRadius="6" Padding="12" 
+                    IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                <TextBlock Text="{Binding ErrorMessage}" Foreground="#991B1B" FontSize="13" TextWrapping="Wrap"/>
+            </Border>
+
+            <!-- Loading Indicator -->
+            <Border Background="#EFF6FF" BorderBrush="#3B82F6" BorderThickness="1" 
+                    CornerRadius="6" Padding="12" IsVisible="{Binding IsLoading}">
+                <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
+                    <TextBlock Text="⏳ Traitement du fichier en cours..." FontSize="13" FontWeight="SemiBold" Foreground="#1D4ED8"/>
+                </StackPanel>
+            </Border>
+
+            <!-- ================= STEP 1: FILE SELECTION ================= -->
+            <Border Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="30"
+                    IsVisible="{Binding IsStep1}">
+                <StackPanel Spacing="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock Text="📁 Sélectionner un fichier Excel ou CSV" FontSize="16" FontWeight="Bold" Foreground="#0F172A" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Formats pris en charge : .xlsx, .csv" FontSize="13" Foreground="#64748B" HorizontalAlignment="Center"/>
+
+                    <Button Command="{Binding BrowseFileCommand}" Classes="accent" Padding="20,12" HorizontalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="Parcourir le fichier" FontSize="14" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </Button>
+
+                    <TextBlock Text="{Binding FileName, StringFormat='Fichier sélectionné : {0}'}" 
+                               FontSize="13" FontWeight="SemiBold" Foreground="#1E3A8A" HorizontalAlignment="Center"
+                               IsVisible="{Binding FileName, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- ================= STEP 2 & 3: PREVIEW & MAPPING ================= -->
+            <Grid ColumnDefinitions="360, *" 
+                  IsVisible="{Binding IsStep2}">
+                
+                <!-- Left Column: Column Mapping -->
+                <Border Grid.Column="0" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,0,16,0">
+                    <StackPanel Spacing="14">
+                        <TextBlock Text="Correspondance des colonnes" FontSize="15" FontWeight="Bold" Foreground="#0F172A"/>
+                        <TextBlock Text="Associez chaque champ aux colonnes de votre fichier :" FontSize="12" Foreground="#64748B"/>
+
+                        <ItemsControl ItemsSource="{Binding ColumnMappings}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Spacing="4" Margin="0,0,0,12">
+                                        <StackPanel Orientation="Horizontal" Spacing="4">
+                                            <TextBlock Text="{Binding DbFieldLabel}" FontSize="12" FontWeight="SemiBold"/>
+                                            <TextBlock Text="*" Foreground="#EF4444" IsVisible="{Binding IsRequired}"/>
+                                        </StackPanel>
+                                        <ComboBox ItemsSource="{Binding AvailableSourceHeaders}" 
+                                                  SelectedItem="{Binding SelectedSourceHeader, Mode=TwoWay}" 
+                                                  HorizontalAlignment="Stretch" CornerRadius="4"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,12,0,0">
+                            <Button Content="Changer de fichier" Command="{Binding ResetWizardCommand}" Classes="outline"/>
+                            <Button Content="Valider &amp; Analyser" Command="{Binding ValidateMappingAndProceedCommand}" Classes="accent"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Right Column: Data Preview -->
+                <Border Grid.Column="1" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="16">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Aperçu des données du fichier (Premières lignes)" FontSize="15" FontWeight="Bold" Foreground="#0F172A"/>
+
+                        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" MaxHeight="450">
+                            <ItemsControl ItemsSource="{Binding PreviewRows}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="#E2E8F0" BorderThickness="0,0,0,1" Padding="8,6">
+                                            <ItemsControl ItemsSource="{Binding}">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <StackPanel Orientation="Horizontal" Spacing="16"/>
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding}" Width="130" FontSize="11" Foreground="#334155"/>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- ================= STEP 4: VALIDATION SUMMARY ================= -->
+            <StackPanel Spacing="16" IsVisible="{Binding IsStep4}">
+                
+                <!-- Metrics Summary Cards -->
+                <Grid ColumnDefinitions="*, *, *, *">
+                    <Border Grid.Column="0" Background="#F8FAFC" BorderBrush="#CBD5E1" BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,0,8,0">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Total des lignes" FontSize="12" Foreground="#64748B"/>
+                            <TextBlock Text="{Binding ValidationResult.TotalRows}" FontSize="22" FontWeight="Bold" Foreground="#0F172A"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="1" Background="#ECFDF5" BorderBrush="#10B981" BorderThickness="1" CornerRadius="8" Padding="16" Margin="4,0,4,0">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Lignes valides à importer" FontSize="12" Foreground="#047857"/>
+                            <TextBlock Text="{Binding ValidationResult.ValidCount}" FontSize="22" FontWeight="Bold" Foreground="#059669"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="2" Background="#FFF7ED" BorderBrush="#F97316" BorderThickness="1" CornerRadius="8" Padding="16" Margin="4,0,4,0">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Doublons ignorés" FontSize="12" Foreground="#C2410C"/>
+                            <TextBlock Text="{Binding ValidationResult.DuplicateCount}" FontSize="22" FontWeight="Bold" Foreground="#EA580C"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="3" Background="#FEF2F2" BorderBrush="#EF4444" BorderThickness="1" CornerRadius="8" Padding="16" Margin="8,0,0,0">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Lignes en erreur" FontSize="12" Foreground="#B91C1C"/>
+                            <TextBlock Text="{Binding ValidationResult.ErrorCount}" FontSize="22" FontWeight="Bold" Foreground="#DC2626"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- Detailed Error Grid -->
+                <Border Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="16">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Détail des erreurs et doublons détectés" FontSize="15" FontWeight="Bold" Foreground="#0F172A"/>
+
+                        <Border Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1" Padding="12,8">
+                            <Grid ColumnDefinitions="80, 180, *">
+                                <TextBlock Grid.Column="0" Text="N° Ligne" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
+                                <TextBlock Grid.Column="1" Text="Valeur / Clé" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
+                                <TextBlock Grid.Column="2" Text="Raison de l'exclusion" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
+                            </Grid>
+                        </Border>
+
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="250">
+                            <ItemsControl ItemsSource="{Binding ValidationErrors}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="#F1F5F9" BorderThickness="0,0,0,1" Padding="12,8">
+                                            <Grid ColumnDefinitions="80, 180, *">
+                                                <TextBlock Grid.Column="0" Text="{Binding RowNumber, StringFormat='Ligne {0}'}" FontSize="12" FontWeight="SemiBold"/>
+                                                <TextBlock Grid.Column="1" Text="{Binding Key}" FontSize="12" Foreground="#334155"/>
+                                                <TextBlock Grid.Column="2" Text="{Binding Reason}" FontSize="12" Foreground="#DC2626"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+
+                        <!-- Action Bar -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12" Margin="0,12,0,0">
+                            <Button Content="Retour au mappage" Command="{Binding GoBackToStepCommand}" CommandParameter="2" Classes="outline"/>
+                            <Button Content="Lancer l'importation" Command="{Binding ExecuteImportCommand}" Classes="accent"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <!-- ================= STEP 6: RESULT CONFIRMATION ================= -->
+            <Border Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="40"
+                    IsVisible="{Binding IsStep6}">
+                <StackPanel Spacing="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock Text="🎉 Importation terminée avec succès !" FontSize="20" FontWeight="Bold" Foreground="#059669" HorizontalAlignment="Center"/>
+
+                    <Grid ColumnDefinitions="*, *" Width="350" HorizontalAlignment="Center">
+                        <StackPanel Grid.Column="0" Spacing="4" HorizontalAlignment="Center">
+                            <TextBlock Text="Lignes importées" FontSize="12" Foreground="#64748B" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{Binding ImportedCount}" FontSize="24" FontWeight="Bold" Foreground="#059669" HorizontalAlignment="Center"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1" Spacing="4" HorizontalAlignment="Center">
+                            <TextBlock Text="Lignes ignorées" FontSize="12" Foreground="#64748B" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{Binding SkippedCount}" FontSize="24" FontWeight="Bold" Foreground="#DC2626" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <Button Content="Importer un autre fichier" Command="{Binding ResetWizardCommand}" Classes="accent" HorizontalAlignment="Center" Padding="20,10"/>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

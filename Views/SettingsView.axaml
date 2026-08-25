@@ -1,0 +1,36 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:EquipmentDechargeManager.ViewModels"
+             xmlns:views="clr-namespace:EquipmentDechargeManager.Views"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
+             x:Class="EquipmentDechargeManager.Views.SettingsView"
+             x:DataType="vm:SettingsViewModel">
+
+    <Grid RowDefinitions="Auto, *">
+        
+        <!-- Settings Header & Navigation Tab Bar -->
+        <Border Grid.Row="0" Background="White" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1" Padding="24,16">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Left" Spacing="4">
+                    <TextBlock Text="Paramètres &amp; Importation de Données" FontSize="20" FontWeight="Bold" Foreground="#0F172A"/>
+                    <TextBlock Text="Importer vos listes d'employés et d'équipements existantes en masse" FontSize="12" Foreground="#64748B"/>
+                </StackPanel>
+
+                <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="8">
+                    <Button Content="👥 Importer des Employés" 
+                            Command="{Binding SelectEmployeesImportCommand}" 
+                            Classes="outline" Padding="14,8"/>
+                    <Button Content="💻 Importer des Équipements" 
+                            Command="{Binding SelectEquipmentImportCommand}" 
+                            Classes="outline" Padding="14,8"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- Active Data Import Wizard Host -->
+        <TransitioningContentControl Grid.Row="1" Content="{Binding ActiveWizard}"/>
+
+    </Grid>
+</UserControl>

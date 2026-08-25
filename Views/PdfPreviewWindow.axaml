@@ -1,0 +1,110 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:EquipmentDechargeManager.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="550"
+        Width="700" Height="550"
+        WindowStartupLocation="CenterOwner"
+        Title="Aperçu &amp; Impression Décharge"
+        x:Class="EquipmentDechargeManager.Views.PdfPreviewWindow"
+        x:DataType="vm:PdfPreviewViewModel">
+
+    <Grid RowDefinitions="Auto, *, Auto">
+        
+        <!-- Header Toolbar -->
+        <Border Grid.Row="0" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1" Padding="16,12">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Left" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding DechargeNumber, StringFormat='Aperçu Décharge - {0}'}" 
+                               FontSize="16" FontWeight="Bold" Foreground="#0F172A"/>
+                    <TextBlock Text="{Binding EmployeeFullName, StringFormat='Bénéficiaire : {0}'}" 
+                               FontSize="12" Foreground="#64748B"/>
+                </StackPanel>
+
+                <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="8">
+                    <Button Command="{Binding SaveAsCommand}" Classes="outline" Padding="12,6">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="💾" FontSize="12"/>
+                            <TextBlock Text="Enregistrer sous..."/>
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding OpenPdfCommand}" Classes="outline" Padding="12,6">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="📄" FontSize="12"/>
+                            <TextBlock Text="Ouvrir PDF"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding PrintCommand}" Classes="accent" Padding="14,6">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="🖨️" FontSize="12"/>
+                            <TextBlock Text="Imprimer"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- Preview Document Container Card -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="24">
+            <Border Background="White" BorderBrush="#CBD5E1" BorderThickness="1" CornerRadius="6" Padding="28" BoxShadow="0 4 12 0 #1E293B0F">
+                <StackPanel Spacing="18">
+                    <!-- Sonatrach Header Mockup Representation -->
+                    <Grid ColumnDefinitions="Auto, *, Auto">
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="🔥" FontSize="20" Foreground="#EB6E14" VerticalAlignment="Center"/>
+                            <TextBlock Text="sonatrach" FontSize="16" FontWeight="Bold" Foreground="#1E1E1E" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        
+                        <StackPanel Grid.Column="1" HorizontalAlignment="Center">
+                            <TextBlock Text="EXPLORATION PRODUCTION" FontSize="9" FontWeight="Bold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="DIVISION PRODUCTION" FontSize="9" FontWeight="Bold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="DIRECTION REGIONALE HASSI R'MEL" FontSize="9" FontWeight="Bold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="DIRECTION INFORMATIQUE" FontSize="9" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        </StackPanel>
+
+                        <Rectangle Grid.Column="2" Width="60"/>
+                    </Grid>
+
+                    <Separator Height="1" Background="#E2E8F0"/>
+
+                    <!-- Title -->
+                    <StackPanel HorizontalAlignment="Center" Spacing="4">
+                        <TextBlock Text="DÉCHARGE" FontSize="18" FontWeight="Bold" Foreground="#1E3A8A" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{Binding DechargeNumber, StringFormat='N° : {0}'}" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Center" Foreground="#475569"/>
+                    </StackPanel>
+
+                    <!-- Beneficiary Card -->
+                    <Border Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="4" Padding="12">
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="INFORMATIONS DU BÉNÉFICIAIRE" FontSize="11" FontWeight="Bold" Foreground="#1E3A8A"/>
+                            <Grid ColumnDefinitions="*, *">
+                                <TextBlock Grid.Column="0" Text="{Binding EmployeeFullName, StringFormat='Nom et Prénom : {0}'}" FontSize="11"/>
+                                <TextBlock Grid.Column="1" Text="{Binding ItemCount, StringFormat='Nombre d\'articles : {0}'}" FontSize="11"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Document Information Banner -->
+                    <Border Background="#EFF6FF" BorderBrush="#3B82F6" BorderThickness="1" CornerRadius="4" Padding="12">
+                        <StackPanel Spacing="6" HorizontalAlignment="Center">
+                            <TextBlock Text="Document PDF prêt pour impression A4 (Format Officiel Sonatrach)" 
+                                       FontSize="12" FontWeight="SemiBold" Foreground="#1D4ED8" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Le fichier PDF A4 complet inclut la mise en page officielle, les numéros d'inventaire, séries et zones de signatures." 
+                                       FontSize="11" Foreground="#3B82F6" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+        </ScrollViewer>
+
+        <!-- Footer Bar -->
+        <Border Grid.Row="2" Background="#F1F5F9" BorderBrush="#E2E8F0" BorderThickness="0,1,0,0" Padding="16,10">
+            <DockPanel>
+                <TextBlock Text="{Binding StatusMessage}" FontSize="12" Foreground="#475569" DockPanel.Dock="Left" VerticalAlignment="Center"/>
+                <Button Content="Fermer" Command="{Binding CloseCommand}" Classes="outline" DockPanel.Dock="Right" HorizontalAlignment="Right" Padding="16,6"/>
+            </DockPanel>
+        </Border>
+
+    </Grid>
+</Window>

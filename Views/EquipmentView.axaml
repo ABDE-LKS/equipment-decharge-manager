@@ -1,0 +1,189 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:EquipmentDechargeManager.ViewModels"
+             xmlns:loc="clr-namespace:EquipmentDechargeManager.Services"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
+             x:Class="EquipmentDechargeManager.Views.EquipmentView"
+             x:DataType="vm:EquipmentViewModel">
+
+    <Grid RowDefinitions="Auto, Auto, *">
+        
+        <!-- Header Toolbar -->
+        <DockPanel Grid.Row="0" Margin="24,20,24,16">
+            <TextBlock Text="{Binding Loc[Eq_Title]}" 
+                       FontSize="22" FontWeight="Bold" Foreground="#0F172A"
+                       DockPanel.Dock="Left" VerticalAlignment="Center"/>
+            <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="10">
+                <Button Command="{Binding OpenAddFormCommand}" 
+                        Classes="accent">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Text="+" FontSize="14" FontWeight="Bold"/>
+                        <TextBlock Text="Ajouter"/>
+                    </StackPanel>
+                </Button>
+                <Button Command="{Binding LoadEquipmentCommand}" 
+                        Classes="outline">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Text="🔄" FontSize="12"/>
+                        <TextBlock Text="Actualiser"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </DockPanel>
+
+        <!-- Search & Filter Controls Bar -->
+        <Border Grid.Row="1" Margin="24,0,24,16">
+            <Grid ColumnDefinitions="*, 160, 160">
+                <TextBox Grid.Column="0" Text="{Binding SearchText, Mode=TwoWay}" 
+                         PlaceholderText="{Binding Loc[Eq_SearchPlaceholder]}" 
+                         Padding="12,9" CornerRadius="6" Margin="0,0,10,0"/>
+                
+                <ComboBox Grid.Column="1" HorizontalAlignment="Stretch" SelectedIndex="0" CornerRadius="6" Margin="0,0,10,0" Padding="10,6">
+                    <ComboBoxItem Content="Type (Tous)"/>
+                    <ComboBoxItem Content="Ordinateur Portable"/>
+                    <ComboBoxItem Content="Écran"/>
+                    <ComboBoxItem Content="Imprimante"/>
+                    <ComboBoxItem Content="Accessoire"/>
+                </ComboBox>
+
+                <ComboBox Grid.Column="2" ItemsSource="{Binding StatusFilterOptions}" 
+                          SelectedItem="{Binding SelectedStatusFilter, Mode=TwoWay}" 
+                          HorizontalAlignment="Stretch" CornerRadius="6" Padding="10,6">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding, TargetNullValue='Statut (Tous)'}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </Grid>
+        </Border>
+
+        <!-- Main Content (Table + Optional Form) -->
+        <Grid Grid.Row="2" Margin="24,0,24,16" ColumnDefinitions="*, Auto">
+            
+            <!-- Table Container -->
+            <Border Grid.Column="0" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="16">
+                <Grid RowDefinitions="Auto, *">
+                    
+                    <!-- Table Header -->
+                    <Border Grid.Row="0" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1" Padding="12,8" CornerRadius="4">
+                        <Grid ColumnDefinitions="1.3*, 1.5*, 1.2*, 1.3*, 1.3*, 1.2*, Auto">
+                            <TextBlock Grid.Column="0" Text="{Binding Loc[Eq_InventoryNumber]}" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
+                            <TextBlock Grid.Column="1" Text="{Binding Loc[Eq_Type]}" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
+                            <TextBlock Grid.Column="2" Text="{Binding Loc[Eq_Brand]}" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
+                            <TextBlock Grid.Column="3" Text="{Binding Loc[Eq_Model]}" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
+                            <TextBlock Grid.Column="4" Text="{Binding Loc[Eq_SerialNumber]}" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
+                            <TextBlock Grid.Column="5" Text="{Binding Loc[Eq_Status]}" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
+                            <TextBlock Grid.Column="6" Text="{Binding Loc[Common_Actions]}" FontSize="11" FontWeight="Bold" Foreground="#64748B" Width="80" TextAlignment="Center"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Table Rows -->
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding Equipments}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border BorderBrush="#F1F5F9" BorderThickness="0,0,0,1" Padding="12,10">
+                                        <Grid ColumnDefinitions="1.3*, 1.5*, 1.2*, 1.3*, 1.3*, 1.2*, Auto">
+                                            <TextBlock Grid.Column="0" Text="{Binding InventoryNumber}" FontSize="12" Foreground="#334155" VerticalAlignment="Center"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding Type}" FontWeight="SemiBold" FontSize="12" Foreground="#0F172A" VerticalAlignment="Center"/>
+                                            <TextBlock Grid.Column="2" Text="{Binding Brand}" FontSize="12" Foreground="#475569" VerticalAlignment="Center"/>
+                                            <TextBlock Grid.Column="3" Text="{Binding Model}" FontSize="12" Foreground="#475569" VerticalAlignment="Center"/>
+                                            <TextBlock Grid.Column="4" Text="{Binding SerialNumber}" FontSize="12" Foreground="#475569" VerticalAlignment="Center"/>
+                                            
+                                            <!-- Status Pill Badge -->
+                                            <Border Grid.Column="5" HorizontalAlignment="Left" VerticalAlignment="Center" 
+                                                    Padding="10,4" CornerRadius="12" Background="{Binding StatusBgColor}">
+                                                <TextBlock Text="{Binding StatusText}" FontSize="11" FontWeight="SemiBold" 
+                                                           Foreground="{Binding StatusFgColor}"/>
+                                            </Border>
+
+                                            <!-- Action Icon Buttons -->
+                                            <StackPanel Grid.Column="6" Orientation="Horizontal" Spacing="6" Width="80" HorizontalAlignment="Center">
+                                                <Button Classes="icon-edit" 
+                                                        Command="{Binding $parent[UserControl].((vm:EquipmentViewModel)DataContext).OpenEditFormCommand}" 
+                                                        CommandParameter="{Binding}" ToolTip.Tip="Modifier">
+                                                    <TextBlock Text="✏️" FontSize="11"/>
+                                                </Button>
+                                                <Button Classes="icon-delete" 
+                                                        Command="{Binding $parent[UserControl].((vm:EquipmentViewModel)DataContext).DeleteEquipmentCommand}" 
+                                                        CommandParameter="{Binding}" ToolTip.Tip="Supprimer">
+                                                    <TextBlock Text="🗑️" FontSize="11"/>
+                                                </Button>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+
+            <!-- Inline Side Form (Add/Edit) -->
+            <Border Grid.Column="1" Width="340" Margin="16,0,0,0" 
+                    Background="White" BorderBrush="#E2E8F0" BorderThickness="1" 
+                    CornerRadius="8" Padding="20" 
+                    IsVisible="{Binding IsFormOpen}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Spacing="14">
+                        <TextBlock Text="{Binding FormTitle}" FontSize="16" FontWeight="Bold" Foreground="#0F172A"/>
+
+                        <!-- Error Banner -->
+                        <Border Background="#FEE2E2" BorderBrush="#EF4444" BorderThickness="1" 
+                                CornerRadius="4" Padding="8" 
+                                IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                            <TextBlock Text="{Binding ErrorMessage}" Foreground="#991B1B" FontSize="12" TextWrapping="Wrap"/>
+                        </Border>
+
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="{Binding Loc[Eq_Type]}" FontSize="12" FontWeight="SemiBold"/>
+                            <TextBox Text="{Binding Type, Mode=TwoWay}" CornerRadius="4"/>
+                        </StackPanel>
+
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="{Binding Loc[Eq_Brand]}" FontSize="12" FontWeight="SemiBold"/>
+                            <TextBox Text="{Binding Brand, Mode=TwoWay}" CornerRadius="4"/>
+                        </StackPanel>
+
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="{Binding Loc[Eq_Model]}" FontSize="12" FontWeight="SemiBold"/>
+                            <TextBox Text="{Binding Model, Mode=TwoWay}" CornerRadius="4"/>
+                        </StackPanel>
+
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="{Binding Loc[Eq_SerialNumber]}" FontSize="12" FontWeight="SemiBold"/>
+                            <TextBox Text="{Binding SerialNumber, Mode=TwoWay}" CornerRadius="4"/>
+                        </StackPanel>
+
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="{Binding Loc[Eq_InventoryNumber]}" FontSize="12" FontWeight="SemiBold"/>
+                            <TextBox Text="{Binding InventoryNumber, Mode=TwoWay}" CornerRadius="4"/>
+                        </StackPanel>
+
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="{Binding Loc[Eq_ShCode]}" FontSize="12" FontWeight="SemiBold"/>
+                            <TextBox Text="{Binding ShCode, Mode=TwoWay}" CornerRadius="4"/>
+                        </StackPanel>
+
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="{Binding Loc[Eq_Status]}" FontSize="12" FontWeight="SemiBold"/>
+                            <ComboBox ItemsSource="{Binding EquipmentStatusOptions}" 
+                                      SelectedItem="{Binding Status, Mode=TwoWay}" 
+                                      HorizontalAlignment="Stretch" CornerRadius="4"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,12,0,0">
+                            <Button Content="{Binding Loc[Common_Cancel]}" Command="{Binding CancelFormCommand}" Classes="outline"/>
+                            <Button Content="{Binding Loc[Common_Save]}" Command="{Binding SaveFormCommand}" Classes="accent"/>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+        </Grid>
+
+    </Grid>
+</UserControl>
