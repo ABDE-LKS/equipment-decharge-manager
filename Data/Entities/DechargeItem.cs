@@ -6,12 +6,14 @@ public class DechargeItem
 {
     public int Id { get; set; }
     public int DechargeId { get; set; }
-    public int EquipmentId { get; set; }
+    public int? EquipmentId { get; set; }
     public string ConditionAtAssignment { get; set; } = string.Empty;
+    public DateOnly AssignmentDate { get; set; } = DateOnly.FromDateTime(DateTime.Today);
+    public DateOnly? ReturnDate { get; set; }
+    public string? ConditionReturned { get; set; }
 
     public Decharge Decharge { get; set; } = null!;
-    public Equipment Equipment { get; set; } = null!;
-    public EquipmentReturn? ReturnRecord { get; set; }
+    public Equipment? Equipment { get; set; }
 
-    public bool IsReturned => ReturnRecord != null;
+    public bool IsReturned => ReturnDate.HasValue;
 }

@@ -14,7 +14,6 @@ public class DechargeDbContext : DbContext
     public DbSet<Equipment> Equipments => Set<Equipment>();
     public DbSet<Decharge> Decharges => Set<Decharge>();
     public DbSet<DechargeItem> DechargeItems => Set<DechargeItem>();
-    public DbSet<EquipmentReturn> EquipmentReturns => Set<EquipmentReturn>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -38,8 +37,8 @@ public class DechargeDbContext : DbContext
             entity.Property(e => e.Type).IsRequired().HasMaxLength(100);
             entity.Property(e => e.Brand).IsRequired().HasMaxLength(100);
             entity.Property(e => e.Model).IsRequired().HasMaxLength(100);
-            entity.Property(e => e.SerialNumber).IsRequired().HasMaxLength(100);
-            entity.Property(e => e.InventoryNumber).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.SerialNumber).HasMaxLength(100);
+            entity.Property(e => e.InventoryNumber).HasMaxLength(100);
             entity.Property(e => e.Status).HasConversion<string>();
         });
 
@@ -54,13 +53,15 @@ public class DechargeDbContext : DbContext
             entity.HasOne(d => d.Employee)
                 .WithMany(e => e.Decharges)
                 .HasForeignKey(d => d.EmployeeId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.SetNull);
         });
 
         // DechargeItem
         modelBuilder.Entity<DechargeItem>(entity =>
         {
             entity.HasKey(di => di.Id);
+            entity.Property(di => di.ConditionAtAssignment).IsRequired().HasMaxLength(500);
+            entity.Property(di => di.ConditionReturned).HasMaxLength(500);
 
             entity.HasOne(di => di.Decharge)
                 .WithMany(d => d.Items)
@@ -70,20 +71,7 @@ public class DechargeDbContext : DbContext
             entity.HasOne(di => di.Equipment)
                 .WithMany(e => e.DechargeItems)
                 .HasForeignKey(di => di.EquipmentId)
-                .OnDelete(DeleteBehavior.Restrict);
-        });
-
-        // EquipmentReturn
-        modelBuilder.Entity<EquipmentReturn>(entity =>
-        {
-            entity.HasKey(er => er.Id);
-            entity.HasIndex(er => er.DechargeItemId).IsUnique();
-            entity.Property(er => er.ConditionReturned).IsRequired().HasMaxLength(100);
-
-            entity.HasOne(er => er.DechargeItem)
-                .WithOne(di => di.ReturnRecord)
-                .HasForeignKey<EquipmentReturn>(er => er.DechargeItemId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.SetNull);
         });
     }
 }

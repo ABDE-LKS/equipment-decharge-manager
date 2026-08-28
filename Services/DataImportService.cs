@@ -117,8 +117,8 @@ public static class DataImportService
         var result = new ImportValidationResult { TotalRows = rawData.Rows.Count };
 
         using var db = DatabaseInitializer.CreateDbContext();
-        var existingInventoryNums = (await db.Equipments.Select(e => e.InventoryNumber.ToLower()).ToListAsync()).ToHashSet();
-        var existingSerialNums = (await db.Equipments.Where(e => !string.IsNullOrEmpty(e.SerialNumber)).Select(e => e.SerialNumber.ToLower()).ToListAsync()).ToHashSet();
+        var existingInventoryNums = (await db.Equipments.Where(e => !string.IsNullOrEmpty(e.InventoryNumber)).Select(e => e.InventoryNumber!.ToLower()).ToListAsync()).ToHashSet();
+        var existingSerialNums = (await db.Equipments.Where(e => !string.IsNullOrEmpty(e.SerialNumber)).Select(e => e.SerialNumber!.ToLower()).ToListAsync()).ToHashSet();
 
         var seenInventoryNums = new HashSet<string>();
         var seenSerialNums = new HashSet<string>();

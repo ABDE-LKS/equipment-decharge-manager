@@ -37,12 +37,12 @@ namespace EquipmentDechargeManager.Migrations
                         .HasColumnType("character varying(50)")
                         .HasColumnName("decharge_number");
 
-                    b.Property<int>("EmployeeId")
+                    b.Property<int?>("EmployeeId")
                         .HasColumnType("integer")
                         .HasColumnName("employee_id");
 
-                    b.Property<DateTime>("IssueDate")
-                        .HasColumnType("timestamp with time zone")
+                    b.Property<DateOnly>("IssueDate")
+                        .HasColumnType("date")
                         .HasColumnName("issue_date");
 
                     b.Property<string>("Notes")
@@ -77,18 +77,32 @@ namespace EquipmentDechargeManager.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateOnly>("AssignmentDate")
+                        .HasColumnType("date")
+                        .HasColumnName("assignment_date");
+
                     b.Property<string>("ConditionAtAssignment")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("condition_at_assignment");
+
+                    b.Property<string>("ConditionReturned")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("condition_returned");
 
                     b.Property<int>("DechargeId")
                         .HasColumnType("integer")
                         .HasColumnName("decharge_id");
 
-                    b.Property<int>("EquipmentId")
+                    b.Property<int?>("EquipmentId")
                         .HasColumnType("integer")
                         .HasColumnName("equipment_id");
+
+                    b.Property<DateOnly?>("ReturnDate")
+                        .HasColumnType("date")
+                        .HasColumnName("return_date");
 
                     b.HasKey("Id")
                         .HasName("pk_decharge_items");
@@ -164,7 +178,6 @@ namespace EquipmentDechargeManager.Migrations
                         .HasColumnName("brand");
 
                     b.Property<string>("InventoryNumber")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
                         .HasColumnName("inventory_number");
@@ -176,7 +189,6 @@ namespace EquipmentDechargeManager.Migrations
                         .HasColumnName("model");
 
                     b.Property<string>("SerialNumber")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
                         .HasColumnName("serial_number");
@@ -210,46 +222,12 @@ namespace EquipmentDechargeManager.Migrations
                     b.ToTable("equipments", (string)null);
                 });
 
-            modelBuilder.Entity("EquipmentDechargeManager.Data.Entities.EquipmentReturn", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ConditionReturned")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("condition_returned");
-
-                    b.Property<int>("DechargeItemId")
-                        .HasColumnType("integer")
-                        .HasColumnName("decharge_item_id");
-
-                    b.Property<DateTime>("ReturnDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("return_date");
-
-                    b.HasKey("Id")
-                        .HasName("pk_equipment_returns");
-
-                    b.HasIndex("DechargeItemId")
-                        .IsUnique()
-                        .HasDatabaseName("ix_equipment_returns_decharge_item_id");
-
-                    b.ToTable("equipment_returns", (string)null);
-                });
-
             modelBuilder.Entity("EquipmentDechargeManager.Data.Entities.Decharge", b =>
                 {
                     b.HasOne("EquipmentDechargeManager.Data.Entities.Employee", "Employee")
                         .WithMany("Decharges")
                         .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
+                        .OnDelete(DeleteBehavior.SetNull)
                         .HasConstraintName("fk_decharges_employees_employee_id");
 
                     b.Navigation("Employee");
@@ -267,8 +245,7 @@ namespace EquipmentDechargeManager.Migrations
                     b.HasOne("EquipmentDechargeManager.Data.Entities.Equipment", "Equipment")
                         .WithMany("DechargeItems")
                         .HasForeignKey("EquipmentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
+                        .OnDelete(DeleteBehavior.SetNull)
                         .HasConstraintName("fk_decharge_items_equipments_equipment_id");
 
                     b.Navigation("Decharge");
@@ -276,26 +253,9 @@ namespace EquipmentDechargeManager.Migrations
                     b.Navigation("Equipment");
                 });
 
-            modelBuilder.Entity("EquipmentDechargeManager.Data.Entities.EquipmentReturn", b =>
-                {
-                    b.HasOne("EquipmentDechargeManager.Data.Entities.DechargeItem", "DechargeItem")
-                        .WithOne("ReturnRecord")
-                        .HasForeignKey("EquipmentDechargeManager.Data.Entities.EquipmentReturn", "DechargeItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_equipment_returns_decharge_items_decharge_item_id");
-
-                    b.Navigation("DechargeItem");
-                });
-
             modelBuilder.Entity("EquipmentDechargeManager.Data.Entities.Decharge", b =>
                 {
                     b.Navigation("Items");
-                });
-
-            modelBuilder.Entity("EquipmentDechargeManager.Data.Entities.DechargeItem", b =>
-                {
-                    b.Navigation("ReturnRecord");
                 });
 
             modelBuilder.Entity("EquipmentDechargeManager.Data.Entities.Employee", b =>

@@ -7,11 +7,11 @@ public class Decharge
 {
     public int Id { get; set; }
     public string DechargeNumber { get; set; } = string.Empty;
-    public int EmployeeId { get; set; }
-    public DateTime IssueDate { get; set; } = DateTime.UtcNow;
+    public int? EmployeeId { get; set; }
+    public DateOnly IssueDate { get; set; } = DateOnly.FromDateTime(DateTime.Today);
     public string Status { get; set; } = "Active";
     public string? Notes { get; set; }
 
-    public Employee Employee { get; set; } = null!;
+    public Employee? Employee { get; set; }
     public ICollection<DechargeItem> Items { get; set; } = new List<DechargeItem>();
 }

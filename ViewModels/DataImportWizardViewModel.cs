@@ -32,15 +32,15 @@ public partial class DataImportWizardViewModel : ViewModelBase
 
     public bool IsStep1 => CurrentStep == 1;
     public bool IsStep2 => CurrentStep == 2;
+    public bool IsStep3 => CurrentStep == 3;
     public bool IsStep4 => CurrentStep == 4;
-    public bool IsStep6 => CurrentStep == 6;
 
     partial void OnCurrentStepChanged(int value)
     {
         OnPropertyChanged(nameof(IsStep1));
         OnPropertyChanged(nameof(IsStep2));
+        OnPropertyChanged(nameof(IsStep3));
         OnPropertyChanged(nameof(IsStep4));
-        OnPropertyChanged(nameof(IsStep6));
     }
 
     [ObservableProperty]

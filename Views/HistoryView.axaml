@@ -1,0 +1,210 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:EquipmentDechargeManager.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="1100" d:DesignHeight="700"
+             x:Class="EquipmentDechargeManager.Views.HistoryView"
+             x:DataType="vm:HistoryViewModel">
+
+    <Grid RowDefinitions="Auto, Auto, *">
+        
+        <!-- Top Header Bar -->
+        <Border Grid.Row="0" Margin="20,16,20,12" Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="4" Padding="16,12">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Left" Spacing="2" VerticalAlignment="Center">
+                    <TextBlock Text="Historique des Décharges" FontSize="18" FontWeight="Bold" Foreground="#111827"/>
+                    <TextBlock Text="Journal d'archivage des décharges entièrement restituées" FontSize="12" Foreground="#6B7280"/>
+                </StackPanel>
+
+                <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                    <Button Command="{Binding LoadHistoryCommand}" Classes="outline" Padding="12,6" CornerRadius="4">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="🔄" FontSize="12"/>
+                            <TextBlock Text="Actualiser" FontWeight="Medium"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- Search Bar Toolbar -->
+        <StackPanel Grid.Row="1" Margin="20,0,20,12" Spacing="10">
+            <Border Background="#FEF2F2" BorderBrush="#FCA5A5" BorderThickness="1" CornerRadius="4" Padding="12,8"
+                    IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                <TextBlock Text="{Binding ErrorMessage}" FontSize="12" Foreground="#991B1B"/>
+            </Border>
+
+            <Border Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="4" Padding="12">
+                <Grid ColumnDefinitions="*, Auto" ColumnSpacing="10">
+                    <TextBox Grid.Column="0" Text="{Binding SearchText, Mode=TwoWay}"
+                             PlaceholderText="Rechercher par employé, matricule, n° décharge ou équipement..."
+                             Padding="10,6" CornerRadius="4"/>
+
+                    <Button Grid.Column="1" Command="{Binding LoadHistoryCommand}" Classes="outline" Padding="12,6" CornerRadius="4">
+                        <TextBlock Text="🔍 Rechercher" FontSize="12"/>
+                    </Button>
+                </Grid>
+            </Border>
+        </StackPanel>
+
+        <!-- History Data Grid Area -->
+        <Border Grid.Row="2" Margin="20,0,20,16" Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="4" Padding="12">
+            <Grid RowDefinitions="Auto, *">
+
+                <!-- Enterprise Table Header Grid -->
+                <Border Grid.Row="0" Background="#F9FAFB" BorderBrush="#E5E7EB" BorderThickness="1" Padding="12,8" CornerRadius="4">
+                    <Grid ColumnDefinitions="1.3*, 2*, 1.2*, 1.2*, 1.2*, 0.9*, 1.1*, Auto" ColumnSpacing="8">
+                        <TextBlock Grid.Column="0" Text="N° DÉCHARGE" FontSize="10" FontWeight="Bold" Foreground="#4B5563"/>
+                        <TextBlock Grid.Column="1" Text="EMPLOYÉ" FontSize="10" FontWeight="Bold" Foreground="#4B5563"/>
+                        <TextBlock Grid.Column="2" Text="MATRICULE" FontSize="10" FontWeight="Bold" Foreground="#4B5563"/>
+                        <TextBlock Grid.Column="3" Text="D. ÉMISSION" FontSize="10" FontWeight="Bold" Foreground="#4B5563"/>
+                        <TextBlock Grid.Column="4" Text="D. RETOUR" FontSize="10" FontWeight="Bold" Foreground="#4B5563"/>
+                        <TextBlock Grid.Column="5" Text="ARTICLES" FontSize="10" FontWeight="Bold" Foreground="#4B5563"/>
+                        <TextBlock Grid.Column="6" Text="STATUT" FontSize="10" FontWeight="Bold" Foreground="#4B5563"/>
+                        <TextBlock Grid.Column="7" Text="ACTION" FontSize="10" FontWeight="Bold" Foreground="#4B5563" Width="76" TextAlignment="Center"/>
+                    </Grid>
+                </Border>
+
+                <!-- Data Rows -->
+                <ScrollViewer Grid.Row="1" Margin="0,4,0,0" VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding HistoryItems}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:HistoryRecordItem">
+                                <Border BorderBrush="#F3F4F6" BorderThickness="0,0,0,1" Padding="12,8">
+                                    <Grid ColumnDefinitions="1.3*, 2*, 1.2*, 1.2*, 1.2*, 0.9*, 1.1*, Auto" ColumnSpacing="8">
+                                        <TextBlock Grid.Column="0" Text="{Binding DechargeNumber}" FontWeight="SemiBold" FontSize="12" Foreground="#2563EB" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding EmployeeName}" FontWeight="Bold" FontSize="12" Foreground="#111827" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="2" Text="{Binding Matricule}" FontSize="12" Foreground="#374151" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="3" Text="{Binding IssueDateText}" FontSize="12" Foreground="#4B5563" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="4" Text="{Binding ReturnDateText}" FontSize="12" Foreground="#4B5563" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="5" Text="{Binding ItemCount}" FontSize="12" FontWeight="SemiBold" Foreground="#111827" VerticalAlignment="Center"/>
+
+                                        <!-- Status Badge -->
+                                        <Border Grid.Column="6" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="8,2" CornerRadius="3" Background="#DEF7EC">
+                                            <TextBlock Text="RETOURNÉE" FontSize="10" FontWeight="Bold" Foreground="#03543F"/>
+                                        </Border>
+
+                                        <!-- Action -->
+                                        <Button Grid.Column="7" Classes="icon-view"
+                                                Command="{Binding $parent[UserControl].((vm:HistoryViewModel)DataContext).OpenDetailsModalCommand}"
+                                                CommandParameter="{Binding}"
+                                                Padding="8,4" CornerRadius="4" HorizontalAlignment="Center" ToolTip.Tip="Détails">
+                                            <TextBlock Text="👁️ Voir" FontSize="11"/>
+                                        </Button>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+
+        <!-- Record Details Dialog Overlay -->
+        <Border IsVisible="{Binding IsDetailsModalOpen}" Background="#60000000" ZIndex="100" Grid.RowSpan="3">
+            <Border HorizontalAlignment="Center" VerticalAlignment="Center" Width="600" Background="White" CornerRadius="4" Padding="20">
+                <Grid RowDefinitions="Auto, *, Auto">
+                    <Border Grid.Row="0" Padding="0,0,0,12" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1">
+                        <DockPanel>
+                            <StackPanel DockPanel.Dock="Left" Spacing="2">
+                                <TextBlock Text="{Binding SelectedHistoryItem.DechargeNumber, StringFormat='Fiche Historique #{0}'}" FontSize="16" FontWeight="Bold" Foreground="#111827"/>
+                                <TextBlock Text="Détails complets de la restitution et matériel restitué" FontSize="12" Foreground="#6B7280"/>
+                            </StackPanel>
+
+                            <Button DockPanel.Dock="Right" Command="{Binding CloseDetailsModalCommand}" Classes="outline" Padding="6,2" CornerRadius="4" HorizontalAlignment="Right">
+                                <TextBlock Text="✕" FontSize="12"/>
+                            </Button>
+                        </DockPanel>
+                    </Border>
+
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,14">
+                        <StackPanel Spacing="14">
+                            <!-- Employee & Decharge Info Panel -->
+                            <Border Background="#F9FAFB" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="4" Padding="12">
+                                <Grid ColumnDefinitions="*, *, *" RowDefinitions="Auto, Auto" ColumnSpacing="12" RowSpacing="10">
+                                    <StackPanel Grid.Row="0" Grid.Column="0" Spacing="2">
+                                        <TextBlock Text="EMPLOYÉ" FontSize="10" FontWeight="Bold" Foreground="#6B7280"/>
+                                        <TextBlock Text="{Binding SelectedHistoryItem.EmployeeName}" FontSize="12" FontWeight="Bold" Foreground="#111827"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="0" Grid.Column="1" Spacing="2">
+                                        <TextBlock Text="MATRICULE" FontSize="10" FontWeight="Bold" Foreground="#6B7280"/>
+                                        <TextBlock Text="{Binding SelectedHistoryItem.Matricule}" FontSize="12" FontWeight="SemiBold" Foreground="#374151"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="0" Grid.Column="2" Spacing="2">
+                                        <TextBlock Text="STRUCTURE" FontSize="10" FontWeight="Bold" Foreground="#6B7280"/>
+                                        <TextBlock Text="{Binding SelectedHistoryItem.Structure}" FontSize="12" Foreground="#374151"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="1" Grid.Column="0" Spacing="2">
+                                        <TextBlock Text="DATE ÉMISSION" FontSize="10" FontWeight="Bold" Foreground="#6B7280"/>
+                                        <TextBlock Text="{Binding SelectedHistoryItem.IssueDateText}" FontSize="12" Foreground="#374151"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="1" Grid.Column="1" Spacing="2">
+                                        <TextBlock Text="DATE RETOUR" FontSize="10" FontWeight="Bold" Foreground="#6B7280"/>
+                                        <TextBlock Text="{Binding SelectedHistoryItem.ReturnDateText}" FontSize="12" Foreground="#047857" FontWeight="Bold"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="1" Grid.Column="2" Spacing="2">
+                                        <TextBlock Text="STATUT" FontSize="10" FontWeight="Bold" Foreground="#6B7280"/>
+                                        <Border Padding="6,2" CornerRadius="3" HorizontalAlignment="Left" Background="#DEF7EC">
+                                            <TextBlock Text="RETOURNÉE" FontSize="10" FontWeight="Bold" Foreground="#03543F"/>
+                                        </Border>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <!-- Detailed Equipment Breakdown Table -->
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="Matériel informatique restitué :" FontSize="12" FontWeight="Bold" Foreground="#111827"/>
+                                <Border Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="4">
+                                    <Grid RowDefinitions="Auto, *">
+                                        <Border Grid.Row="0" Background="#F9FAFB" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1" Padding="10,6">
+                                            <Grid ColumnDefinitions="1.2*, 1*, 1*, 1*, 1.1*, 1.1*, 1.1*" ColumnSpacing="6">
+                                                <TextBlock Grid.Column="0" Text="TYPE" FontSize="10" FontWeight="Bold" Foreground="#4B5563"/>
+                                                <TextBlock Grid.Column="1" Text="MARQUE" FontSize="10" FontWeight="Bold" Foreground="#4B5563"/>
+                                                <TextBlock Grid.Column="2" Text="MODÈLE" FontSize="10" FontWeight="Bold" Foreground="#4B5563"/>
+                                                <TextBlock Grid.Column="3" Text="CODE SH" FontSize="10" FontWeight="Bold" Foreground="#4B5563"/>
+                                                <TextBlock Grid.Column="4" Text="N° SÉRIE" FontSize="10" FontWeight="Bold" Foreground="#4B5563"/>
+                                                <TextBlock Grid.Column="5" Text="N° INVENTAIRE" FontSize="10" FontWeight="Bold" Foreground="#4B5563"/>
+                                                <TextBlock Grid.Column="6" Text="ÉTAT RETOUR" FontSize="10" FontWeight="Bold" Foreground="#4B5563"/>
+                                            </Grid>
+                                        </Border>
+
+                                        <ItemsControl Grid.Row="1" ItemsSource="{Binding SelectedHistoryItem.EquipmentDetails}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate x:DataType="vm:HistoryEquipmentDetailModel">
+                                                    <Border BorderBrush="#F3F4F6" BorderThickness="0,0,0,1" Padding="10,6">
+                                                        <Grid ColumnDefinitions="1.2*, 1*, 1*, 1*, 1.1*, 1.1*, 1.1*" ColumnSpacing="6">
+                                                            <TextBlock Grid.Column="0" Text="{Binding Type}" FontSize="11" FontWeight="SemiBold" Foreground="#111827" VerticalAlignment="Center"/>
+                                                            <TextBlock Grid.Column="1" Text="{Binding Brand}" FontSize="11" Foreground="#374151" VerticalAlignment="Center"/>
+                                                            <TextBlock Grid.Column="2" Text="{Binding Model}" FontSize="11" Foreground="#374151" VerticalAlignment="Center"/>
+                                                            <TextBlock Grid.Column="3" Text="{Binding ShCode}" FontSize="11" Foreground="#4B5563" VerticalAlignment="Center"/>
+                                                            <TextBlock Grid.Column="4" Text="{Binding SerialNumber}" FontSize="11" Foreground="#374151" VerticalAlignment="Center"/>
+                                                            <TextBlock Grid.Column="5" Text="{Binding InventoryNumber}" FontSize="11" Foreground="#374151" VerticalAlignment="Center"/>
+                                                            <TextBlock Grid.Column="6" Text="{Binding ConditionReturned}" FontSize="11" Foreground="#374151" VerticalAlignment="Center"/>
+                                                        </Grid>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </Grid>
+                                </Border>
+                            </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <Border Grid.Row="2" Padding="0,12,0,0" BorderBrush="#E5E7EB" BorderThickness="0,1,0,0">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+                            <Button Content="Fermer" Command="{Binding CloseDetailsModalCommand}" Classes="accent" Padding="14,6" CornerRadius="4"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+        </Border>
+
+    </Grid>
+</UserControl>

@@ -7,18 +7,26 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="tools/**/*.cs" />
+    <Compile Remove="obj/**/*.cs" />
+    <Compile Remove="bin/**/*.cs" />
+    <Compile Remove="_scratch/**/*.cs" />
+    <None Include="tools/**/*" />
+  </ItemGroup>
+
+  <!-- Stop stale debug instances so rebuilds don't fail with MSB3027 file-lock errors -->
+  <Target Name="StopRunningAppBeforeBuild" BeforeTargets="Build" Condition="'$(OS)' == 'Windows_NT'">
+    <Exec Command="taskkill /F /IM EquipmentDechargeManager.exe 2&gt;nul" IgnoreExitCode="true" />
+  </Target>
+
+  <ItemGroup>
+    <None Update="appsettings.json" CopyToOutputDirectory="PreserveNewest" Condition="Exists('appsettings.json')" />
+    <None Update="appsettings.example.json" CopyToOutputDirectory="Never" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Models\" />
     <AvaloniaResource Include="Assets\**" />
-    <EmbeddedResource Update="Resources\Strings.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Strings.fr.resx">
-      <DependentUpon>Strings.resx</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Strings.en.resx">
-      <DependentUpon>Strings.resx</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>

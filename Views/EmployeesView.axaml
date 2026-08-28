@@ -3,90 +3,97 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:EquipmentDechargeManager.ViewModels"
-             xmlns:loc="clr-namespace:EquipmentDechargeManager.Services"
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
              x:Class="EquipmentDechargeManager.Views.EmployeesView"
              x:DataType="vm:EmployeesViewModel">
 
     <Grid RowDefinitions="Auto, Auto, *">
         
-        <!-- Header Toolbar -->
-        <DockPanel Grid.Row="0" Margin="24,20,24,16">
-            <TextBlock Text="{Binding Loc[Emp_Title]}" 
-                       FontSize="22" FontWeight="Bold" Foreground="#0F172A"
-                       DockPanel.Dock="Left" VerticalAlignment="Center"/>
-            <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="10">
-                <Button Command="{Binding OpenAddFormCommand}" 
-                        Classes="accent">
-                    <StackPanel Orientation="Horizontal" Spacing="6">
-                        <TextBlock Text="+" FontSize="14" FontWeight="Bold"/>
-                        <TextBlock Text="Ajouter"/>
-                    </StackPanel>
-                </Button>
-                <Button Command="{Binding LoadEmployeesCommand}" 
-                        Classes="outline">
-                    <StackPanel Orientation="Horizontal" Spacing="6">
-                        <TextBlock Text="🔄" FontSize="12"/>
-                        <TextBlock Text="Actualiser"/>
-                    </StackPanel>
-                </Button>
-            </StackPanel>
-        </DockPanel>
+        <!-- Top Header & Action Bar -->
+        <Border Grid.Row="0" Margin="20,16,20,12" Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="4" Padding="16,12">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Left" Spacing="2" VerticalAlignment="Center">
+                    <TextBlock Text="Annuaire des Employés" FontSize="18" FontWeight="Bold" Foreground="#111827"/>
+                    <TextBlock Text="Gestion du personnel et affectations d'équipements" FontSize="12" Foreground="#6B7280"/>
+                </StackPanel>
 
-        <!-- Search Bar Row -->
-        <Border Grid.Row="1" Margin="24,0,24,16">
-            <Grid ColumnDefinitions="*, Auto">
-                <TextBox Grid.Column="0" Text="{Binding SearchText, Mode=TwoWay}" 
-                         PlaceholderText="{Binding Loc[Emp_SearchPlaceholder]}" 
-                         Padding="12,9" CornerRadius="6"/>
-                <Button Grid.Column="1" Command="{Binding LoadEmployeesCommand}" 
-                        Classes="outline" Margin="8,0,0,0" Padding="12,8">
-                    <TextBlock Text="🔍" FontSize="14"/>
-                </Button>
-            </Grid>
+                <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                    <Button Command="{Binding OpenAddFormCommand}" Classes="accent" Padding="14,6" CornerRadius="4">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="＋" FontSize="13" FontWeight="Bold"/>
+                            <TextBlock Text="Ajouter un employé" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding LoadEmployeesCommand}" Classes="outline" Padding="12,6" CornerRadius="4">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="🔄" FontSize="12"/>
+                            <TextBlock Text="Actualiser" FontWeight="Medium"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </DockPanel>
         </Border>
 
-        <!-- Main Content Area (Table + Optional Side Form) -->
-        <Grid Grid.Row="2" Margin="24,0,24,16" ColumnDefinitions="*, Auto">
+        <!-- Search Bar & Banners -->
+        <StackPanel Grid.Row="1" Margin="20,0,20,12" Spacing="10">
+            <Border Background="#ECFDF5" BorderBrush="#A7F3D0" BorderThickness="1" CornerRadius="4" Padding="12,8"
+                    IsVisible="{Binding SuccessMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                <TextBlock Text="{Binding SuccessMessage}" FontSize="12" Foreground="#065F46" FontWeight="Medium"/>
+            </Border>
+
+            <Border Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="4" Padding="12">
+                <Grid ColumnDefinitions="*, Auto" ColumnSpacing="10">
+                    <TextBox Grid.Column="0" Text="{Binding SearchText, Mode=TwoWay}" 
+                             PlaceholderText="Rechercher par nom, matricule ou structure..." 
+                             Padding="10,6" CornerRadius="4"/>
+                    <Button Grid.Column="1" Command="{Binding LoadEmployeesCommand}" Classes="outline" Padding="12,6" CornerRadius="4">
+                        <TextBlock Text="🔍 Rechercher" FontSize="12"/>
+                    </Button>
+                </Grid>
+            </Border>
+        </StackPanel>
+
+        <!-- Main Content Area (Data Grid + Optional Side Form) -->
+        <Grid Grid.Row="2" Margin="20,0,20,16" ColumnDefinitions="*, Auto">
             
-            <!-- Employee Table Container -->
-            <Border Grid.Column="0" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="16">
+            <!-- Employee Data Grid Container -->
+            <Border Grid.Column="0" Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="4" Padding="12">
                 <Grid RowDefinitions="Auto, *">
                     
                     <!-- Table Header -->
-                    <Border Grid.Row="0" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1" Padding="12,8" CornerRadius="4">
-                        <Grid ColumnDefinitions="1.2*, 2*, 2*, 1.2*, 1.2*, Auto">
-                            <TextBlock Grid.Column="0" Text="{Binding Loc[Emp_Matricule]}" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
-                            <TextBlock Grid.Column="1" Text="{Binding Loc[Emp_FullName]}" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
-                            <TextBlock Grid.Column="2" Text="{Binding Loc[Emp_Function]}" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
-                            <TextBlock Grid.Column="3" Text="{Binding Loc[Emp_Structure]}" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
-                            <TextBlock Grid.Column="4" Text="{Binding Loc[Emp_Region]}" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
-                            <TextBlock Grid.Column="5" Text="{Binding Loc[Common_Actions]}" FontSize="11" FontWeight="Bold" Foreground="#64748B" Width="80" TextAlignment="Center"/>
+                    <Border Grid.Row="0" Background="#F9FAFB" BorderBrush="#E5E7EB" BorderThickness="1" Padding="12,8" CornerRadius="4">
+                        <Grid ColumnDefinitions="1.2*, 2*, 2*, 1.2*, 1.2*, Auto" ColumnSpacing="8">
+                            <TextBlock Grid.Column="0" Text="MATRICULE" FontSize="10" FontWeight="Bold" Foreground="#4B5563"/>
+                            <TextBlock Grid.Column="1" Text="NOM COMPLET" FontSize="10" FontWeight="Bold" Foreground="#4B5563"/>
+                            <TextBlock Grid.Column="2" Text="FONCTION" FontSize="10" FontWeight="Bold" Foreground="#4B5563"/>
+                            <TextBlock Grid.Column="3" Text="STRUCTURE" FontSize="10" FontWeight="Bold" Foreground="#4B5563"/>
+                            <TextBlock Grid.Column="4" Text="RÉGION" FontSize="10" FontWeight="Bold" Foreground="#4B5563"/>
+                            <TextBlock Grid.Column="5" Text="ACTIONS" FontSize="10" FontWeight="Bold" Foreground="#4B5563" Width="76" TextAlignment="Center"/>
                         </Grid>
                     </Border>
 
                     <!-- Table Rows -->
-                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer Grid.Row="1" Margin="0,4,0,0" VerticalScrollBarVisibility="Auto">
                         <ItemsControl ItemsSource="{Binding Employees}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border BorderBrush="#F1F5F9" BorderThickness="0,0,0,1" Padding="12,10">
-                                        <Grid ColumnDefinitions="1.2*, 2*, 2*, 1.2*, 1.2*, Auto">
-                                            <TextBlock Grid.Column="0" Text="{Binding Matricule}" FontSize="12" Foreground="#334155" VerticalAlignment="Center"/>
-                                            <TextBlock Grid.Column="1" Text="{Binding FullName}" FontWeight="SemiBold" FontSize="12" Foreground="#0F172A" VerticalAlignment="Center"/>
-                                            <TextBlock Grid.Column="2" Text="{Binding Function}" FontSize="12" Foreground="#475569" VerticalAlignment="Center"/>
-                                            <TextBlock Grid.Column="3" Text="{Binding Structure}" FontSize="12" Foreground="#475569" VerticalAlignment="Center"/>
-                                            <TextBlock Grid.Column="4" Text="{Binding Region}" FontSize="12" Foreground="#475569" VerticalAlignment="Center"/>
+                                    <Border BorderBrush="#F3F4F6" BorderThickness="0,0,0,1" Padding="12,8">
+                                        <Grid ColumnDefinitions="1.2*, 2*, 2*, 1.2*, 1.2*, Auto" ColumnSpacing="8">
+                                            <TextBlock Grid.Column="0" Text="{Binding Matricule}" FontSize="12" FontWeight="SemiBold" Foreground="#2563EB" VerticalAlignment="Center"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding FullName}" FontWeight="Bold" FontSize="12" Foreground="#111827" VerticalAlignment="Center"/>
+                                            <TextBlock Grid.Column="2" Text="{Binding Function}" FontSize="12" Foreground="#374151" VerticalAlignment="Center"/>
+                                            <TextBlock Grid.Column="3" Text="{Binding Structure}" FontSize="12" Foreground="#374151" VerticalAlignment="Center"/>
+                                            <TextBlock Grid.Column="4" Text="{Binding Region}" FontSize="12" Foreground="#4B5563" VerticalAlignment="Center"/>
                                             
-                                            <!-- Action Icon Buttons -->
-                                            <StackPanel Grid.Column="5" Orientation="Horizontal" Spacing="6" Width="80" HorizontalAlignment="Center">
+                                            <!-- Action Buttons -->
+                                            <StackPanel Grid.Column="5" Orientation="Horizontal" Spacing="4" Width="76" HorizontalAlignment="Center">
                                                 <Button Classes="icon-edit" 
                                                         Command="{Binding $parent[UserControl].((vm:EmployeesViewModel)DataContext).OpenEditFormCommand}" 
                                                         CommandParameter="{Binding}" ToolTip.Tip="Modifier">
                                                     <TextBlock Text="✏️" FontSize="11"/>
                                                 </Button>
                                                 <Button Classes="icon-delete" 
-                                                        Command="{Binding $parent[UserControl].((vm:EmployeesViewModel)DataContext).DeleteEmployeeCommand}" 
+                                                        Command="{Binding $parent[UserControl].((vm:EmployeesViewModel)DataContext).OpenDeleteConfirmationCommand}" 
                                                         CommandParameter="{Binding}" ToolTip.Tip="Supprimer">
                                                     <TextBlock Text="🗑️" FontSize="11"/>
                                                 </Button>
@@ -100,56 +107,114 @@
                 </Grid>
             </Border>
 
-            <!-- Inline Side Form (Add/Edit) -->
-            <Border Grid.Column="1" Width="340" Margin="16,0,0,0" 
-                    Background="White" BorderBrush="#E2E8F0" BorderThickness="1" 
-                    CornerRadius="8" Padding="20" 
+            <!-- Inline Side Form Panel (Add/Edit) -->
+            <Border Grid.Column="1" Width="320" Margin="16,0,0,0" 
+                    Background="White" BorderBrush="#E5E7EB" BorderThickness="1" 
+                    CornerRadius="4" Padding="16" 
                     IsVisible="{Binding IsFormOpen}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Spacing="14">
-                        <TextBlock Text="{Binding FormTitle}" FontSize="16" FontWeight="Bold" Foreground="#0F172A"/>
+                        <TextBlock Text="{Binding FormTitle}" FontSize="15" FontWeight="Bold" Foreground="#111827"/>
+                        <Border Height="1" Background="#E5E7EB" Margin="0,-4,0,0"/>
 
                         <!-- Error Banner -->
-                        <Border Background="#FEE2E2" BorderBrush="#EF4444" BorderThickness="1" 
-                                CornerRadius="4" Padding="8" 
+                        <Border Background="#FEF2F2" BorderBrush="#FCA5A5" BorderThickness="1" 
+                                CornerRadius="4" Padding="10" 
                                 IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-                            <TextBlock Text="{Binding ErrorMessage}" Foreground="#991B1B" FontSize="12" TextWrapping="Wrap"/>
+                            <TextBlock Text="{Binding ErrorMessage}" Foreground="#991B1B" FontSize="11" TextWrapping="Wrap"/>
                         </Border>
 
                         <StackPanel Spacing="4">
-                            <TextBlock Text="{Binding Loc[Emp_FullName]}" FontSize="12" FontWeight="SemiBold"/>
-                            <TextBox Text="{Binding FullName, Mode=TwoWay}" CornerRadius="4"/>
+                            <TextBlock Text="Nom complet *" FontSize="12" FontWeight="SemiBold" Foreground="#374151"/>
+                            <TextBox Text="{Binding FullName, Mode=TwoWay}" CornerRadius="4" Padding="10,6"/>
                         </StackPanel>
 
                         <StackPanel Spacing="4">
-                            <TextBlock Text="{Binding Loc[Emp_Matricule]}" FontSize="12" FontWeight="SemiBold"/>
-                            <TextBox Text="{Binding Matricule, Mode=TwoWay}" CornerRadius="4"/>
+                            <TextBlock Text="Matricule *" FontSize="12" FontWeight="SemiBold" Foreground="#374151"/>
+                            <TextBox Text="{Binding Matricule, Mode=TwoWay}" CornerRadius="4" Padding="10,6"/>
                         </StackPanel>
 
                         <StackPanel Spacing="4">
-                            <TextBlock Text="{Binding Loc[Emp_Function]}" FontSize="12" FontWeight="SemiBold"/>
-                            <TextBox Text="{Binding Function, Mode=TwoWay}" CornerRadius="4"/>
+                            <TextBlock Text="Fonction" FontSize="12" FontWeight="SemiBold" Foreground="#374151"/>
+                            <TextBox Text="{Binding Function, Mode=TwoWay}" CornerRadius="4" Padding="10,6"/>
                         </StackPanel>
 
                         <StackPanel Spacing="4">
-                            <TextBlock Text="{Binding Loc[Emp_Structure]}" FontSize="12" FontWeight="SemiBold"/>
-                            <TextBox Text="{Binding Structure, Mode=TwoWay}" CornerRadius="4"/>
+                            <TextBlock Text="Structure" FontSize="12" FontWeight="SemiBold" Foreground="#374151"/>
+                            <TextBox Text="{Binding Structure, Mode=TwoWay}" CornerRadius="4" Padding="10,6"/>
                         </StackPanel>
 
                         <StackPanel Spacing="4">
-                            <TextBlock Text="{Binding Loc[Emp_Region]}" FontSize="12" FontWeight="SemiBold"/>
-                            <TextBox Text="{Binding Region, Mode=TwoWay}" CornerRadius="4"/>
+                            <TextBlock Text="Région" FontSize="12" FontWeight="SemiBold" Foreground="#374151"/>
+                            <TextBox Text="{Binding Region, Mode=TwoWay}" CornerRadius="4" Padding="10,6"/>
                         </StackPanel>
 
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,12,0,0">
-                            <Button Content="{Binding Loc[Common_Cancel]}" Command="{Binding CancelFormCommand}" Classes="outline"/>
-                            <Button Content="{Binding Loc[Common_Save]}" Command="{Binding SaveFormCommand}" Classes="accent"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,10,0,0">
+                            <Button Content="Annuler" Command="{Binding CancelFormCommand}" Classes="outline" Padding="12,6" CornerRadius="4"/>
+                            <Button Content="Enregistrer" Command="{Binding SaveFormCommand}" Classes="accent" Padding="14,6" CornerRadius="4"/>
                         </StackPanel>
                     </StackPanel>
                 </ScrollViewer>
             </Border>
 
         </Grid>
+
+        <!-- Delete Confirmation Dialog Overlay -->
+        <Border IsVisible="{Binding IsDeleteConfirmOpen}" Background="#60000000" ZIndex="100" Grid.RowSpan="3">
+            <Border HorizontalAlignment="Center" VerticalAlignment="Center" Width="420" Background="White" CornerRadius="4" Padding="20">
+                <Grid RowDefinitions="Auto, *, Auto">
+                    <Border Grid.Row="0" Padding="0,0,0,12" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1">
+                        <StackPanel Spacing="2">
+                            <TextBlock Text="Supprimer l'employé" FontSize="16" FontWeight="Bold" Foreground="#111827"/>
+                            <TextBlock Text="Confirmation de la suppression" FontSize="12" Foreground="#6B7280"/>
+                        </StackPanel>
+                    </Border>
+
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,14">
+                        <StackPanel Spacing="12">
+                            <!-- Employee Summary Card -->
+                            <Border Background="#F9FAFB" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="4" Padding="12">
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="{Binding EmployeeToDelete.FullName}" FontSize="13" FontWeight="Bold" Foreground="#111827"/>
+                                    <TextBlock Text="{Binding EmployeeToDelete.Matricule, StringFormat='Matricule : {0}'}" FontSize="12" Foreground="#374151"/>
+                                    <TextBlock Text="{Binding EmployeeToDelete.Structure, StringFormat='Structure : {0}'}" FontSize="12" Foreground="#6B7280"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Warning banner when deletion is BLOCKED -->
+                            <Border IsVisible="{Binding !CanDeleteEmployee}" Background="#FEF2F2" BorderBrush="#FCA5A5" BorderThickness="1" CornerRadius="4" Padding="12">
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="⚠️ Impossible de supprimer cet employé" FontSize="12" FontWeight="Bold" Foreground="#991B1B"/>
+                                    <TextBlock Text="Impossible de supprimer cet employé car il possède une décharge active."
+                                               FontSize="12" Foreground="#991B1B" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Confirmation prompt when deletion is ALLOWED -->
+                            <Border IsVisible="{Binding CanDeleteEmployee}" Background="#FFFBEB" BorderBrush="#FDE68A" BorderThickness="1" CornerRadius="4" Padding="12">
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="Êtes-vous sûr de vouloir supprimer cet employé ?" FontSize="12" FontWeight="Bold" Foreground="#B45309"/>
+                                    <TextBlock Text="Cette action supprimera définitivement cet employé de la base de données." FontSize="12" Foreground="#78350F" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Background="#FEF2F2" BorderBrush="#EF4444" BorderThickness="1" CornerRadius="4" Padding="10"
+                                    IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                <TextBlock Text="{Binding ErrorMessage}" Foreground="#991B1B" FontSize="12" TextWrapping="Wrap"/>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <Border Grid.Row="2" Padding="0,12,0,0" BorderBrush="#E5E7EB" BorderThickness="0,1,0,0">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                            <Button Content="Fermer" Command="{Binding CancelDeleteConfirmationCommand}" Classes="outline" IsVisible="{Binding !CanDeleteEmployee}" Padding="12,6" CornerRadius="4"/>
+                            <Button Content="Annuler" Command="{Binding CancelDeleteConfirmationCommand}" Classes="outline" IsVisible="{Binding CanDeleteEmployee}" Padding="12,6" CornerRadius="4"/>
+                            <Button Content="Confirmer la suppression" Command="{Binding ConfirmDeleteEmployeeCommand}" Classes="danger" IsVisible="{Binding CanDeleteEmployee}" Padding="14,6" CornerRadius="4"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+        </Border>
 
     </Grid>
 </UserControl>

@@ -3,131 +3,186 @@
         xmlns:vm="using:EquipmentDechargeManager.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:loc="clr-namespace:EquipmentDechargeManager.Services"
         mc:Ignorable="d" d:DesignWidth="1440" d:DesignHeight="900"
         x:Class="EquipmentDechargeManager.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
         Title="Equipment Decharge Manager"
         WindowStartupLocation="CenterScreen"
-        WindowState="Maximized"
-        Width="1440" Height="900" MinWidth="1100" MinHeight="700">
+        WindowState="Normal"
+        Width="1440" Height="900" MinWidth="1100" MinHeight="700"
+        CanResize="True"
+        ExtendClientAreaToDecorationsHint="False">
 
     <Design.DataContext>
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <Grid ColumnDefinitions="220, *">
+    <Grid RowDefinitions="Auto, *">
         
-        <!-- Sidebar Navigation -->
-        <Border Grid.Column="0" Background="#1A2238" Padding="12,16">
-            <Grid RowDefinitions="Auto, *">
+        <!-- Custom Top Title Bar (Visible Title & Window Controls) -->
+        <Border Grid.Row="0" Background="#0F172A" Height="36" Padding="12,0,0,0" PointerPressed="Header_PointerPressed">
+            <Grid ColumnDefinitions="Auto, *, Auto">
                 
-                <!-- Nav Menu Items -->
-                <StackPanel Grid.Row="1" Spacing="6" Margin="0,12,0,0">
-                    <!-- Dashboard -->
-                    <Button Command="{Binding NavigateDashboardCommand}" 
-                            HorizontalAlignment="Stretch" 
-                            HorizontalContentAlignment="Left"
-                            Padding="12,10" CornerRadius="6" 
-                            Background="#2B3654" Foreground="White" FontWeight="SemiBold">
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <TextBlock Text="🏠" FontSize="14"/>
-                            <TextBlock Text="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[Nav_Dashboard]}" VerticalAlignment="Center"/>
-                        </StackPanel>
+                <!-- App Icon & Title -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <Image Source="avares://EquipmentDechargeManager/Assets/sonatrach_logo_wt.png" 
+                           Height="18" Width="18" Stretch="Uniform" VerticalAlignment="Center"/>
+                    <TextBlock Text="Equipment Decharge Manager" 
+                               Foreground="White" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Draggable Center Space -->
+                <Panel Grid.Column="1" Background="Transparent"/>
+
+                <!-- Window Action Buttons (Minimize, Maximize, Close) -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="0" VerticalAlignment="Stretch">
+                    <Button Click="MinimizeWindow_Click" Width="46" Height="36" Background="Transparent" 
+                            Foreground="#9CA3AF" CornerRadius="0" Padding="0" 
+                            HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
+                            ToolTip.Tip="Réduire">
+                        <TextBlock Text="—" FontSize="11" FontWeight="Bold"/>
                     </Button>
 
-                    <!-- Employees -->
-                    <Button Command="{Binding NavigateEmployeesCommand}" 
-                            HorizontalAlignment="Stretch" 
-                            HorizontalContentAlignment="Left"
-                            Padding="12,10" CornerRadius="6" 
-                            Background="Transparent" Foreground="#94A3B8" FontWeight="Medium">
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <TextBlock Text="👤" FontSize="14"/>
-                            <TextBlock Text="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[Nav_Employees]}" VerticalAlignment="Center"/>
-                        </StackPanel>
+                    <Button Click="MaximizeWindow_Click" Width="46" Height="36" Background="Transparent" 
+                            Foreground="#9CA3AF" CornerRadius="0" Padding="0" 
+                            HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
+                            ToolTip.Tip="Agrandir / Restaurer">
+                        <TextBlock Text="▢" FontSize="12" FontWeight="Bold"/>
                     </Button>
 
-                    <!-- Equipment -->
-                    <Button Command="{Binding NavigateEquipmentCommand}" 
-                            HorizontalAlignment="Stretch" 
-                            HorizontalContentAlignment="Left"
-                            Padding="12,10" CornerRadius="6" 
-                            Background="Transparent" Foreground="#94A3B8" FontWeight="Medium">
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <TextBlock Text="💻" FontSize="14"/>
-                            <TextBlock Text="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[Nav_Equipment]}" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-
-                    <!-- Decharges -->
-                    <Button Command="{Binding NavigateDechargesCommand}" 
-                            HorizontalAlignment="Stretch" 
-                            HorizontalContentAlignment="Left"
-                            Padding="12,10" CornerRadius="6" 
-                            Background="Transparent" Foreground="#94A3B8" FontWeight="Medium">
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <TextBlock Text="📋" FontSize="14"/>
-                            <TextBlock Text="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[Nav_Decharges]}" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-
-                    <!-- Details Decharge -->
-                    <Button Command="{Binding NavigateDechargesCommand}" 
-                            HorizontalAlignment="Stretch" 
-                            HorizontalContentAlignment="Left"
-                            Padding="12,10" CornerRadius="6" 
-                            Background="Transparent" Foreground="#94A3B8" FontWeight="Medium">
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <TextBlock Text="📄" FontSize="14"/>
-                            <TextBlock Text="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[Nav_DechargeDetails]}" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-
-                    <!-- Settings / Paramètres -->
-                    <Button Command="{Binding NavigateSettingsCommand}" 
-                            HorizontalAlignment="Stretch" 
-                            HorizontalContentAlignment="Left"
-                            Padding="12,10" CornerRadius="6" 
-                            Background="Transparent" Foreground="#94A3B8" FontWeight="Medium">
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <TextBlock Text="⚙️" FontSize="14"/>
-                            <TextBlock Text="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[Nav_Settings]}" VerticalAlignment="Center"/>
-                        </StackPanel>
+                    <Button Click="CloseWindow_Click" Width="46" Height="36" Background="Transparent" 
+                            Foreground="#9CA3AF" CornerRadius="0" Padding="0" 
+                            HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
+                            ToolTip.Tip="Fermer">
+                        <Button.Styles>
+                            <Style Selector="Button:pointerover">
+                                <Setter Property="Background" Value="#DC2626"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Style>
+                        </Button.Styles>
+                        <TextBlock Text="✕" FontSize="12" FontWeight="Bold"/>
                     </Button>
                 </StackPanel>
 
             </Grid>
         </Border>
 
-        <!-- Right Content Area (Header + Main View Host) -->
-        <Grid Grid.Column="1" RowDefinitions="Auto, *">
+        <!-- Main Body (Sidebar + Right Content Workspace) -->
+        <Grid Grid.Row="1" ColumnDefinitions="210, *">
             
-            <!-- Top Header Bar -->
-            <Border Grid.Row="0" Background="White" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1" Padding="24,12">
-                <DockPanel>
-                    <!-- App Title -->
-                    <TextBlock Text="Equipment Decharge Manager" 
-                               FontSize="16" FontWeight="Bold" Foreground="#0F172A"
-                               DockPanel.Dock="Left" VerticalAlignment="Center"/>
+            <!-- Sidebar Navigation (Dark Navy #1E293B) -->
+            <Border Grid.Column="0" Background="#1E293B" Padding="12,16">
+                <Grid RowDefinitions="Auto, *, Auto">
                     
-                    <!-- Language Indicator (100% French) -->
-                    <Border DockPanel.Dock="Right" HorizontalAlignment="Right" Background="#F1F5F9" Padding="10,4" CornerRadius="4">
-                        <StackPanel Orientation="Horizontal" Spacing="4">
-                            <TextBlock Text="FR" FontWeight="Bold" Foreground="#2563EB" FontSize="12"/>
-                            <TextBlock Text=" ∨" FontSize="10" Foreground="#64748B" VerticalAlignment="Center"/>
+                    <!-- Sidebar Header / Sonatrach Branding -->
+                    <StackPanel Grid.Row="0" Spacing="8" Margin="0,0,0,16">
+                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                            <Image Source="avares://EquipmentDechargeManager/Assets/sonatrach_logo_wt.png" 
+                                   Height="28" Width="28" Stretch="Uniform" VerticalAlignment="Center"/>
+                            <StackPanel VerticalAlignment="Center" Spacing="0">
+                                <TextBlock Text="SONATRACH" FontSize="13" FontWeight="Bold" Foreground="White" LetterSpacing="0.5"/>
+                                <TextBlock Text="Gestion des Décharges" FontSize="10" Foreground="#9CA3AF"/>
+                            </StackPanel>
                         </StackPanel>
-                    </Border>
-                </DockPanel>
+                        <Border Height="1" Background="#374151" Margin="0,6,0,0"/>
+                    </StackPanel>
+
+                    <!-- Nav Menu Items -->
+                    <StackPanel Grid.Row="1" Spacing="4">
+                        <!-- Dashboard -->
+                        <Button Classes="nav-btn"
+                                Classes.active="{Binding IsDashboardActive}"
+                                Command="{Binding NavigateDashboardCommand}" 
+                                HorizontalAlignment="Stretch" 
+                                HorizontalContentAlignment="Left"
+                                Padding="10,8" CornerRadius="4">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <TextBlock Text="📊" FontSize="13"/>
+                                <TextBlock Text="Tableau de bord" VerticalAlignment="Center" FontSize="12"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- Employees -->
+                        <Button Classes="nav-btn"
+                                Classes.active="{Binding IsEmployeesActive}"
+                                Command="{Binding NavigateEmployeesCommand}" 
+                                HorizontalAlignment="Stretch" 
+                                HorizontalContentAlignment="Left"
+                                Padding="10,8" CornerRadius="4">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <TextBlock Text="👤" FontSize="13"/>
+                                <TextBlock Text="Employés" VerticalAlignment="Center" FontSize="12"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- Equipment -->
+                        <Button Classes="nav-btn"
+                                Classes.active="{Binding IsEquipmentActive}"
+                                Command="{Binding NavigateEquipmentCommand}" 
+                                HorizontalAlignment="Stretch" 
+                                HorizontalContentAlignment="Left"
+                                Padding="10,8" CornerRadius="4">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <TextBlock Text="💻" FontSize="13"/>
+                                <TextBlock Text="Équipements" VerticalAlignment="Center" FontSize="12"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- Decharges -->
+                        <Button Classes="nav-btn"
+                                Classes.active="{Binding IsDechargesActive}"
+                                Command="{Binding NavigateDechargesCommand}" 
+                                HorizontalAlignment="Stretch" 
+                                HorizontalContentAlignment="Left"
+                                Padding="10,8" CornerRadius="4">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <TextBlock Text="📋" FontSize="13"/>
+                                <TextBlock Text="Décharges" VerticalAlignment="Center" FontSize="12"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- History -->
+                        <Button Classes="nav-btn"
+                                Classes.active="{Binding IsHistoryActive}"
+                                Command="{Binding NavigateHistoryCommand}" 
+                                HorizontalAlignment="Stretch" 
+                                HorizontalContentAlignment="Left"
+                                Padding="10,8" CornerRadius="4">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <TextBlock Text="🕒" FontSize="13"/>
+                                <TextBlock Text="Historique" VerticalAlignment="Center" FontSize="12"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- Settings / Paramètres -->
+                        <Button Classes="nav-btn"
+                                Classes.active="{Binding IsSettingsActive}"
+                                Command="{Binding NavigateSettingsCommand}" 
+                                HorizontalAlignment="Stretch" 
+                                HorizontalContentAlignment="Left"
+                                Padding="10,8" CornerRadius="4">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <TextBlock Text="⚙️" FontSize="13"/>
+                                <TextBlock Text="Paramètres" VerticalAlignment="Center" FontSize="12"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+
+                    <!-- Sidebar Footer Status (Discreet) -->
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" Margin="4,4,4,0">
+                        <Border Width="6" Height="6" CornerRadius="3" Background="#10B981" VerticalAlignment="Center"/>
+                        <TextBlock Text="Base de données connectée" FontSize="10" Foreground="#9CA3AF" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                </Grid>
             </Border>
 
-            <!-- Main Workspace View Host -->
-            <Border Grid.Row="1" Background="#F8FAFC">
+            <!-- Right Content Area (Main View Host) -->
+            <Border Grid.Column="1" Background="#F3F4F6">
                 <TransitioningContentControl Content="{Binding CurrentView}"/>
             </Border>
 
         </Grid>
-
     </Grid>
 </Window>

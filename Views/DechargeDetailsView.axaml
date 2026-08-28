@@ -3,174 +3,278 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:EquipmentDechargeManager.ViewModels"
-             xmlns:loc="clr-namespace:EquipmentDechargeManager.Services"
-             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
+             mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="800"
              x:Class="EquipmentDechargeManager.Views.DechargeDetailsView"
              x:DataType="vm:DechargeDetailsViewModel">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel Spacing="20" Margin="24">
+    <Grid RowDefinitions="Auto, *">
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="16" Margin="20">
 
-            <!-- Header & Back Button -->
-            <DockPanel>
-                <Button Command="{Binding GoBackCommand}" 
-                        Classes="outline" DockPanel.Dock="Left">
-                    <StackPanel Orientation="Horizontal" Spacing="6">
-                        <TextBlock Text="←" FontSize="14"/>
-                        <TextBlock Text="Retour"/>
-                    </StackPanel>
-                </Button>
-
-                <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="8">
-                    <Button Command="{Binding OpenPdfPreviewCommand}" Classes="accent">
+                <!-- Top Navigation Toolbar -->
+                <DockPanel>
+                    <Button Command="{Binding GoBackCommand}" Classes="outline" DockPanel.Dock="Left" Padding="12,6" CornerRadius="4">
                         <StackPanel Orientation="Horizontal" Spacing="6">
-                            <TextBlock Text="🖨️" FontSize="14"/>
-                            <TextBlock Text="Générer PDF / Imprimer"/>
+                            <TextBlock Text="←" FontSize="13" FontWeight="Bold"/>
+                            <TextBlock Text="Retour" FontWeight="Medium"/>
                         </StackPanel>
                     </Button>
-                </StackPanel>
 
-                <TextBlock Text="{Binding DechargeNumber, StringFormat='Détails décharge - {0}'}" 
-                           FontSize="20" FontWeight="Bold" Foreground="#0F172A"
-                           Margin="16,0,0,0" VerticalAlignment="Center"/>
-            </DockPanel>
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
+                        <Button Command="{Binding PrintDechargeCommand}" Classes="outline" Padding="12,6" CornerRadius="4">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock Text="🖨️" FontSize="13"/>
+                                <TextBlock Text="Imprimer PDF" FontWeight="Medium"/>
+                            </StackPanel>
+                        </Button>
 
-            <!-- Error Banner -->
-            <Border Background="#FEE2E2" BorderBrush="#EF4444" BorderThickness="1" 
-                    CornerRadius="6" Padding="12" 
-                    IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-                <TextBlock Text="{Binding ErrorMessage}" Foreground="#991B1B"/>
-            </Border>
+                        <Button Command="{Binding OpenReturnModalCommand}" Classes="accent" IsVisible="{Binding IsActive}" Padding="14,6" CornerRadius="4">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock Text="↩" FontSize="13" FontWeight="Bold"/>
+                                <TextBlock Text="Restituer la décharge" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </DockPanel>
 
-            <!-- Main Workspace: Left Info + Right Return Form -->
-            <Grid ColumnDefinitions="*, Auto">
-                
-                <!-- Left Column (General Info Card + Articles Table Card) -->
-                <StackPanel Grid.Column="0" Spacing="16">
-                    
-                    <!-- Card 1: Informations générales -->
-                    <Border Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="16">
-                        <StackPanel Spacing="12">
-                            <TextBlock Text="Informations générales" FontSize="14" FontWeight="Bold" Foreground="#0F172A"/>
+                <!-- Banners -->
+                <Border Background="#FEF2F2" BorderBrush="#FCA5A5" BorderThickness="1" CornerRadius="4" Padding="12,8"
+                        IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                    <TextBlock Text="{Binding ErrorMessage}" Foreground="#991B1B" FontSize="12"/>
+                </Border>
 
-                            <Grid ColumnDefinitions="1.2*, 2*, 1.2*, 2*">
-                                <StackPanel Grid.Column="0" Spacing="4">
-                                    <TextBlock Text="{Binding Loc[Dec_Number]}" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
-                                    <TextBlock Text="{Binding DechargeNumber}" FontSize="12" FontWeight="SemiBold" Foreground="#0F172A"/>
-                                </StackPanel>
+                <Border Background="#ECFDF5" BorderBrush="#A7F3D0" BorderThickness="1" CornerRadius="4" Padding="12,8"
+                        IsVisible="{Binding SuccessMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                    <TextBlock Text="{Binding SuccessMessage}" Foreground="#065F46" FontSize="12" FontWeight="Medium"/>
+                </Border>
 
-                                <StackPanel Grid.Column="1" Spacing="4">
-                                    <TextBlock Text="{Binding Loc[Dec_Employee]}" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
-                                    <TextBlock Text="{Binding EmployeeFullName}" FontSize="12" Foreground="#334155"/>
-                                </StackPanel>
+                <!-- Header Information Card -->
+                <Border Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="4" Padding="20">
+                    <StackPanel Spacing="16">
+                        <DockPanel>
+                            <StackPanel DockPanel.Dock="Left" Spacing="2">
+                                <TextBlock Text="{Binding DechargeNumber, StringFormat='Fiche Décharge #{0}'}" FontSize="18" FontWeight="Bold" Foreground="#111827"/>
+                                <TextBlock Text="Informations relatives à la mise à disposition d'équipement" FontSize="12" Foreground="#6B7280"/>
+                            </StackPanel>
 
-                                <StackPanel Grid.Column="2" Spacing="4">
-                                    <TextBlock Text="{Binding Loc[Dec_IssueDate]}" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
-                                    <TextBlock Text="{Binding IssueDateText}" FontSize="12" Foreground="#334155"/>
-                                </StackPanel>
-
-                                <StackPanel Grid.Column="3" Spacing="4">
-                                    <TextBlock Text="{Binding Loc[Common_Notes]}" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
-                                    <TextBlock Text="{Binding NotesText}" FontSize="12" Foreground="#334155" TextWrapping="Wrap"/>
-                                </StackPanel>
-                            </Grid>
-                        </StackPanel>
-                    </Border>
-
-                    <!-- Card 2: Articles de la décharge Table -->
-                    <Border Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="16">
-                        <StackPanel Spacing="12">
-                            <TextBlock Text="Articles de la décharge" FontSize="14" FontWeight="Bold" Foreground="#0F172A"/>
-
-                            <!-- Table Header -->
-                            <Border Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1" Padding="12,8" CornerRadius="4">
-                                <Grid ColumnDefinitions="2*, 1.2*, 1.2*, 1.2*, Auto">
-                                    <TextBlock Grid.Column="0" Text="Équipement" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
-                                    <TextBlock Grid.Column="1" Text="N° Inventaire" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
-                                    <TextBlock Grid.Column="2" Text="État à l'attribution" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
-                                    <TextBlock Grid.Column="3" Text="Statut" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
-                                    <TextBlock Grid.Column="4" Text="Retour" FontSize="11" FontWeight="Bold" Foreground="#64748B" Width="130" TextAlignment="Center"/>
-                                </Grid>
+                            <Border DockPanel.Dock="Right" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <Panel>
+                                    <Border IsVisible="{Binding IsActive}" Background="#FEF3C7" Padding="10,3" CornerRadius="3">
+                                        <TextBlock Text="ACTIVE" FontSize="11" FontWeight="Bold" Foreground="#92400E"/>
+                                    </Border>
+                                    <Border IsVisible="{Binding IsReturned}" Background="#DEF7EC" Padding="10,3" CornerRadius="3">
+                                        <TextBlock Text="RETOURNÉE" FontSize="11" FontWeight="Bold" Foreground="#03543F"/>
+                                    </Border>
+                                </Panel>
                             </Border>
+                        </DockPanel>
 
-                            <!-- Table Rows -->
-                            <ItemsControl ItemsSource="{Binding ItemsList}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border BorderBrush="#F1F5F9" BorderThickness="0,0,0,1" Padding="12,10">
-                                            <Grid ColumnDefinitions="2*, 1.2*, 1.2*, 1.2*, Auto">
-                                                <TextBlock Grid.Column="0" Text="{Binding EquipmentName}" FontWeight="SemiBold" FontSize="12" Foreground="#0F172A" VerticalAlignment="Center"/>
-                                                <TextBlock Grid.Column="1" Text="{Binding InventoryNumber}" FontSize="12" Foreground="#334155" VerticalAlignment="Center"/>
-                                                <TextBlock Grid.Column="2" Text="{Binding ConditionAtAssignment}" FontSize="12" Foreground="#334155" VerticalAlignment="Center"/>
-                                                
-                                                <!-- Status Badge Pill -->
-                                                <Border Grid.Column="3" HorizontalAlignment="Left" Padding="8,4" CornerRadius="12" Background="{Binding StatusBgColor}">
-                                                    <TextBlock Text="{Binding StatusText}" FontSize="11" FontWeight="SemiBold" Foreground="{Binding StatusFgColor}"/>
-                                                </Border>
+                        <Border Height="1" Background="#E5E7EB"/>
 
-                                                <!-- Action Column -->
-                                                <StackPanel Grid.Column="4" Width="130" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                                    <!-- Show Enregistrer retour button if not returned -->
-                                                    <Button Content="Enregistrer retour" 
-                                                            Command="{Binding $parent[UserControl].((vm:DechargeDetailsViewModel)DataContext).OpenReturnFormCommand}" 
-                                                            CommandParameter="{Binding}" 
-                                                            IsVisible="{Binding !IsReturned}" 
-                                                            Classes="outline" Padding="8,4" FontSize="11"/>
+                        <!-- Metadata Grid -->
+                        <Grid ColumnDefinitions="*, *, *, *" RowDefinitions="Auto, Auto" ColumnSpacing="16" RowSpacing="14">
+                            <StackPanel Grid.Row="0" Grid.Column="0" Spacing="2">
+                                <TextBlock Text="EMPLOYÉ" FontSize="10" FontWeight="Bold" Foreground="#6B7280"/>
+                                <TextBlock Text="{Binding EmployeeFullName}" FontSize="13" FontWeight="Bold" Foreground="#111827"/>
+                            </StackPanel>
 
-                                                    <!-- Show Return Details if returned -->
-                                                    <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding IsReturned}" VerticalAlignment="Center">
-                                                        <TextBlock Text="{Binding ReturnDateText}" FontSize="11" Foreground="#64748B" VerticalAlignment="Center"/>
-                                                        <Border Background="#ECFDF5" Padding="6,2" CornerRadius="8">
-                                                            <TextBlock Text="{Binding ReturnConditionText}" FontSize="11" FontWeight="SemiBold" Foreground="#10B981"/>
-                                                        </Border>
-                                                    </StackPanel>
-                                                </StackPanel>
-                                            </Grid>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </StackPanel>
-                    </Border>
+                            <StackPanel Grid.Row="0" Grid.Column="1" Spacing="2">
+                                <TextBlock Text="MATRICULE" FontSize="10" FontWeight="Bold" Foreground="#6B7280"/>
+                                <TextBlock Text="{Binding EmployeeMatricule}" FontSize="12" FontWeight="SemiBold" Foreground="#374151"/>
+                            </StackPanel>
 
-                </StackPanel>
+                            <StackPanel Grid.Row="0" Grid.Column="2" Spacing="2">
+                                <TextBlock Text="FONCTION" FontSize="10" FontWeight="Bold" Foreground="#6B7280"/>
+                                <TextBlock Text="{Binding EmployeeFunction}" FontSize="12" Foreground="#374151"/>
+                            </StackPanel>
 
-                <!-- Right Column: Return Form Side Card ("Enregistrer le retour") -->
-                <Border Grid.Column="1" Width="360" Margin="16,0,0,0" 
-                        Background="White" BorderBrush="#E2E8F0" BorderThickness="1" 
-                        CornerRadius="8" Padding="20" 
-                        IsVisible="{Binding IsReturnFormOpen}">
-                    <StackPanel Spacing="14">
-                        <TextBlock Text="Enregistrer le retour" FontSize="16" FontWeight="Bold" Foreground="#0F172A"/>
+                            <StackPanel Grid.Row="0" Grid.Column="3" Spacing="2">
+                                <TextBlock Text="DATE ÉMISSION" FontSize="10" FontWeight="Bold" Foreground="#6B7280"/>
+                                <TextBlock Text="{Binding IssueDateText}" FontSize="12" Foreground="#374151" FontWeight="SemiBold"/>
+                            </StackPanel>
 
-                        <StackPanel Spacing="4">
-                            <TextBlock Text="Date de retour *" FontSize="12" FontWeight="SemiBold" Foreground="#334155"/>
-                            <DatePicker HorizontalAlignment="Stretch"/>
-                        </StackPanel>
+                            <StackPanel Grid.Row="1" Grid.Column="0" Spacing="2">
+                                <TextBlock Text="STRUCTURE" FontSize="10" FontWeight="Bold" Foreground="#6B7280"/>
+                                <TextBlock Text="{Binding EmployeeStructure}" FontSize="12" Foreground="#374151"/>
+                            </StackPanel>
 
-                        <StackPanel Spacing="4">
-                            <TextBlock Text="État à la restitution *" FontSize="12" FontWeight="SemiBold" Foreground="#334155"/>
-                            <ComboBox SelectedIndex="0" HorizontalAlignment="Stretch" CornerRadius="4">
-                                <ComboBoxItem Content="Bon"/>
-                                <ComboBoxItem Content="Endommagé"/>
-                                <ComboBoxItem Content="Perdu"/>
-                            </ComboBox>
-                        </StackPanel>
+                            <StackPanel Grid.Row="1" Grid.Column="1" Spacing="2">
+                                <TextBlock Text="RÉGION" FontSize="10" FontWeight="Bold" Foreground="#6B7280"/>
+                                <TextBlock Text="{Binding EmployeeRegion}" FontSize="12" Foreground="#374151"/>
+                            </StackPanel>
 
-                        <StackPanel Spacing="4">
-                            <TextBlock Text="Notes" FontSize="12" FontWeight="SemiBold" Foreground="#334155"/>
-                            <TextBox Text="{Binding ReturnNotes, Mode=TwoWay}" PlaceholderText="Notes (optionnel)" Height="60" AcceptsReturn="True" CornerRadius="4"/>
-                        </StackPanel>
-
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,12,0,0">
-                            <Button Content="Annuler" Command="{Binding CancelReturnFormCommand}" Classes="outline"/>
-                            <Button Content="Enregistrer" Command="{Binding SaveReturnCommand}" Classes="accent"/>
-                        </StackPanel>
+                            <StackPanel Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" Spacing="2">
+                                <TextBlock Text="OBSERVATIONS" FontSize="10" FontWeight="Bold" Foreground="#6B7280"/>
+                                <TextBlock Text="{Binding NotesText}" FontSize="12" Foreground="#374151" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Grid>
                     </StackPanel>
                 </Border>
 
-            </Grid>
+                <!-- Affected Equipment Table Card -->
+                <Border Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="4" Padding="16">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Équipements affectés" FontSize="14" FontWeight="Bold" Foreground="#111827"/>
 
-        </StackPanel>
-    </ScrollViewer>
+                        <Border Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="4">
+                            <Grid RowDefinitions="Auto, *">
+                                <!-- Enterprise Header -->
+                                <Border Grid.Row="0" Background="#F9FAFB" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1" Padding="12,8">
+                                    <Grid ColumnDefinitions="1.2*, 1*, 1*, 1.1*, 1.2*, 1.2*, 1.1*, 1.1*, 1.1*, 1.1*" ColumnSpacing="6">
+                                        <TextBlock Grid.Column="0" Text="TYPE" FontSize="10" FontWeight="Bold" Foreground="#4B5563"/>
+                                        <TextBlock Grid.Column="1" Text="MARQUE" FontSize="10" FontWeight="Bold" Foreground="#4B5563"/>
+                                        <TextBlock Grid.Column="2" Text="MODÈLE" FontSize="10" FontWeight="Bold" Foreground="#4B5563"/>
+                                        <TextBlock Grid.Column="3" Text="CODE SH" FontSize="10" FontWeight="Bold" Foreground="#4B5563"/>
+                                        <TextBlock Grid.Column="4" Text="N° SÉRIE" FontSize="10" FontWeight="Bold" Foreground="#4B5563"/>
+                                        <TextBlock Grid.Column="5" Text="N° INVENTAIRE" FontSize="10" FontWeight="Bold" Foreground="#4B5563"/>
+                                        <TextBlock Grid.Column="6" Text="D. AFFECTATION" FontSize="10" FontWeight="Bold" Foreground="#4B5563"/>
+                                        <TextBlock Grid.Column="7" Text="ÉTAT DÉPART" FontSize="10" FontWeight="Bold" Foreground="#4B5563"/>
+                                        <TextBlock Grid.Column="8" Text="D. RETOUR" FontSize="10" FontWeight="Bold" Foreground="#4B5563"/>
+                                        <TextBlock Grid.Column="9" Text="ÉTAT RETOUR" FontSize="10" FontWeight="Bold" Foreground="#4B5563"/>
+                                    </Grid>
+                                </Border>
+
+                                <!-- Table Rows -->
+                                <ItemsControl Grid.Row="1" ItemsSource="{Binding Items}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="vm:DechargeDetailsItemModel">
+                                            <Border BorderBrush="#F3F4F6" BorderThickness="0,0,0,1" Padding="12,8">
+                                                <Grid ColumnDefinitions="1.2*, 1*, 1*, 1.1*, 1.2*, 1.2*, 1.1*, 1.1*, 1.1*, 1.1*" ColumnSpacing="6">
+                                                    <TextBlock Grid.Column="0" Text="{Binding Type}" FontWeight="SemiBold" FontSize="12" Foreground="#111827" VerticalAlignment="Center"/>
+                                                    <TextBlock Grid.Column="1" Text="{Binding Brand}" FontSize="12" Foreground="#374151" VerticalAlignment="Center"/>
+                                                    <TextBlock Grid.Column="2" Text="{Binding Model}" FontSize="12" Foreground="#374151" VerticalAlignment="Center"/>
+                                                    <TextBlock Grid.Column="3" Text="{Binding ShCode}" FontSize="12" Foreground="#4B5563" VerticalAlignment="Center"/>
+                                                    <TextBlock Grid.Column="4" Text="{Binding SerialNumber}" FontSize="12" Foreground="#374151" VerticalAlignment="Center"/>
+                                                    <TextBlock Grid.Column="5" Text="{Binding InventoryNumber}" FontSize="12" Foreground="#374151" VerticalAlignment="Center"/>
+                                                    <TextBlock Grid.Column="6" Text="{Binding AssignmentDateText}" FontSize="12" Foreground="#4B5563" VerticalAlignment="Center"/>
+                                                    <TextBlock Grid.Column="7" Text="{Binding ConditionAtAssignment}" FontSize="12" Foreground="#374151" VerticalAlignment="Center"/>
+                                                    <TextBlock Grid.Column="8" Text="{Binding ReturnDateText}" FontSize="12" Foreground="#4B5563" VerticalAlignment="Center"/>
+                                                    <TextBlock Grid.Column="9" Text="{Binding ConditionReturned}" FontSize="12" Foreground="#374151" VerticalAlignment="Center"/>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Restitution Dialog Overlay -->
+        <Border IsVisible="{Binding IsReturnModalOpen}" Background="#70000000" ZIndex="100">
+            <Border HorizontalAlignment="Center" VerticalAlignment="Center" Width="560" MaxHeight="680" Background="White" CornerRadius="12" Padding="24" BoxShadow="0 20 25 -5 #40000000">
+                <Grid RowDefinitions="Auto, *, Auto">
+                    <!-- Dialog Header -->
+                    <Border Grid.Row="0" Padding="0,0,0,16" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1">
+                        <DockPanel>
+                            <Button DockPanel.Dock="Right" Command="{Binding CancelReturnModalCommand}" Width="32" Height="32" CornerRadius="16" Background="#F1F5F9" Foreground="#64748B" HorizontalAlignment="Right" Padding="0">
+                                <TextBlock Text="✕" FontSize="13" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Button>
+                            <StackPanel Spacing="4">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="↩" FontSize="18" FontWeight="Bold" Foreground="#059669"/>
+                                    <TextBlock Text="Restituer la décharge" FontSize="18" FontWeight="Bold" Foreground="#0F172A"/>
+                                </StackPanel>
+                                <TextBlock Text="Enregistrement du retour des équipements et mise à jour du statut." FontSize="12" Foreground="#64748B"/>
+                            </StackPanel>
+                        </DockPanel>
+                    </Border>
+
+                    <!-- Dialog Body -->
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,16">
+                        <StackPanel Spacing="16">
+
+                            <!-- Context Summary Box -->
+                            <Border Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="14">
+                                <Grid ColumnDefinitions="*, *" RowDefinitions="Auto, Auto" RowSpacing="8" ColumnSpacing="12">
+                                    <StackPanel Grid.Row="0" Grid.Column="0" Spacing="2">
+                                        <TextBlock Text="DÉCHARGE" FontSize="10" FontWeight="Bold" Foreground="#64748B"/>
+                                        <TextBlock Text="{Binding DechargeNumber}" FontSize="13" FontWeight="Bold" Foreground="#0F172A"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="0" Grid.Column="1" Spacing="2">
+                                        <TextBlock Text="EMPLOYÉ" FontSize="10" FontWeight="Bold" Foreground="#64748B"/>
+                                        <TextBlock Text="{Binding EmployeeFullName}" FontSize="13" FontWeight="SemiBold" Foreground="#0F172A"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Spacing="4">
+                                        <TextBlock Text="ÉQUIPEMENTS À RESTITUER" FontSize="10" FontWeight="Bold" Foreground="#64748B"/>
+                                        <ItemsControl ItemsSource="{Binding Items}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate x:DataType="vm:DechargeDetailsItemModel">
+                                                    <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,1">
+                                                        <TextBlock Text="•" FontSize="12" Foreground="#059669" FontWeight="Bold"/>
+                                                        <TextBlock Text="{Binding Type}" FontWeight="SemiBold" FontSize="12" Foreground="#0F172A"/>
+                                                        <TextBlock Text="{Binding Brand}" FontSize="12" Foreground="#475569"/>
+                                                        <TextBlock Text="{Binding Model}" FontSize="12" Foreground="#475569"/>
+                                                        <TextBlock Text="—" FontSize="12" Foreground="#94A3B8"/>
+                                                        <TextBlock Text="{Binding SerialNumber}" FontSize="12" Foreground="#64748B"/>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <!-- Restitution Date -->
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="Date de restitution *" FontSize="12" FontWeight="SemiBold" Foreground="#334155"/>
+                                <DatePicker SelectedDate="{Binding ReturnDate, Mode=TwoWay}" HorizontalAlignment="Stretch"/>
+                            </StackPanel>
+
+                            <!-- Return Condition with Presets -->
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="État des équipements au retour *" FontSize="12" FontWeight="SemiBold" Foreground="#334155"/>
+
+                                <!-- Quick Presets -->
+                                <WrapPanel Margin="0,0,0,4">
+                                    <Button Command="{Binding SetReturnConditionPresetCommand}" CommandParameter="Bon état" Classes="preset-chip" Margin="0,0,6,6">
+                                        <TextBlock Text="✓ Bon état"/>
+                                    </Button>
+                                    <Button Command="{Binding SetReturnConditionPresetCommand}" CommandParameter="État moyen" Classes="preset-chip" Margin="0,0,6,6">
+                                        <TextBlock Text="⚡ État moyen"/>
+                                    </Button>
+                                    <Button Command="{Binding SetReturnConditionPresetCommand}" CommandParameter="Endommagé" Classes="preset-chip" Margin="0,0,6,6">
+                                        <TextBlock Text="⚠️ Endommagé"/>
+                                    </Button>
+                                    <Button Command="{Binding SetReturnConditionPresetCommand}" CommandParameter="Incomplet / Accessoire manquant" Classes="preset-chip" Margin="0,0,6,6">
+                                        <TextBlock Text="❓ Incomplet"/>
+                                    </Button>
+                                </WrapPanel>
+
+                                <TextBox Text="{Binding ReturnCondition, Mode=TwoWay}" PlaceholderText="Saisissez ou choisissez un état..." CornerRadius="6" Padding="12,8"/>
+                            </StackPanel>
+
+                            <!-- Observations -->
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="Observations &amp; remarques complémentaires (Optionnel)" FontSize="12" FontWeight="SemiBold" Foreground="#334155"/>
+                                <TextBox Text="{Binding ReturnNotes, Mode=TwoWay}" Height="70" AcceptsReturn="True" TextWrapping="Wrap" PlaceholderText="Ex: Câble d'alimentation fourni, légère rayure sur la coque..." CornerRadius="6" Padding="12,8"/>
+                            </StackPanel>
+
+                            <!-- Error Message Banner -->
+                            <Border Background="#FEF2F2" BorderBrush="#FCA5A5" BorderThickness="1" CornerRadius="6" Padding="12,8"
+                                    IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                <TextBlock Text="{Binding ErrorMessage}" Foreground="#991B1B" FontSize="12"/>
+                            </Border>
+
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <!-- Dialog Action Bar -->
+                    <Border Grid.Row="2" Padding="0,16,0,0" BorderBrush="#E2E8F0" BorderThickness="0,1,0,0">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12">
+                            <Button Content="Annuler" Command="{Binding CancelReturnModalCommand}" Classes="outline" Padding="16,8" CornerRadius="6"/>
+                            <Button Command="{Binding SaveReturnCommand}" Classes="success" Padding="18,8" CornerRadius="6">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <TextBlock Text="✓" FontSize="13" FontWeight="Bold"/>
+                                    <TextBlock Text="Confirmer la restitution" FontWeight="SemiBold"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+        </Border>
+    </Grid>
 </UserControl>

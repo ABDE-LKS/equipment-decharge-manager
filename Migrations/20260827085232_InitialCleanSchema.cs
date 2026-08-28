@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EquipmentDechargeManager.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialCleanSchema : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -38,8 +38,8 @@ namespace EquipmentDechargeManager.Migrations
                     type = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     brand = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     model = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    serial_number = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    inventory_number = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    serial_number = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    inventory_number = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     sh_code = table.Column<string>(type: "text", nullable: true),
                     status = table.Column<string>(type: "text", nullable: false)
                 },
@@ -56,8 +56,11 @@ namespace EquipmentDechargeManager.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     decharge_number = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     employee_id = table.Column<int>(type: "integer", nullable: false),
-                    issue_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    notes = table.Column<string>(type: "text", nullable: true)
+                    issue_date = table.Column<DateOnly>(type: "date", nullable: false),
+                    status = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    notes = table.Column<string>(type: "text", nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -78,8 +81,10 @@ namespace EquipmentDechargeManager.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     decharge_id = table.Column<int>(type: "integer", nullable: false),
                     equipment_id = table.Column<int>(type: "integer", nullable: false),
-                    condition_at_assignment = table.Column<string>(type: "text", nullable: false),
-                    is_returned = table.Column<bool>(type: "boolean", nullable: false)
+                    condition_at_assignment = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    assignment_date = table.Column<DateOnly>(type: "date", nullable: false),
+                    return_date = table.Column<DateOnly>(type: "date", nullable: true),
+                    condition_returned = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -98,28 +103,6 @@ namespace EquipmentDechargeManager.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "equipment_returns",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    decharge_item_id = table.Column<int>(type: "integer", nullable: false),
-                    return_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    condition = table.Column<string>(type: "text", nullable: false),
-                    notes = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_equipment_returns", x => x.id);
-                    table.ForeignKey(
-                        name: "fk_equipment_returns_decharge_items_decharge_item_id",
-                        column: x => x.decharge_item_id,
-                        principalTable: "decharge_items",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "ix_decharge_items_decharge_id",
                 table: "decharge_items",
@@ -128,9 +111,7 @@ namespace EquipmentDechargeManager.Migrations
             migrationBuilder.CreateIndex(
                 name: "ix_decharge_items_equipment_id",
                 table: "decharge_items",
-                column: "equipment_id",
-                unique: true,
-                filter: "is_returned = false");
+                column: "equipment_id");
 
             migrationBuilder.CreateIndex(
                 name: "ix_decharges_decharge_number",
@@ -150,12 +131,6 @@ namespace EquipmentDechargeManager.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "ix_equipment_returns_decharge_item_id",
-                table: "equipment_returns",
-                column: "decharge_item_id",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "ix_equipments_inventory_number",
                 table: "equipments",
                 column: "inventory_number",
@@ -171,9 +146,6 @@ namespace EquipmentDechargeManager.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "equipment_returns");
-
             migrationBuilder.DropTable(
                 name: "decharge_items");
 

@@ -18,16 +18,24 @@ public class ViewLocator : IDataTemplate
     {
         if (param is null)
             return null;
-        
-        var name = param.GetType().FullName!.Replace("ViewModel", "View", StringComparison.Ordinal);
-        var type = Type.GetType(name);
 
-        if (type != null)
+        var type = param.GetType();
+        var fullName = type.FullName;
+        if (string.IsNullOrWhiteSpace(fullName))
+            return null;
+
+        // Convert ViewModelName to ViewName by replacing namespace and "ViewModel" suffix
+        var viewTypeName = fullName
+            .Replace("EquipmentDechargeManager.ViewModels", "EquipmentDechargeManager.Views", StringComparison.Ordinal)
+            .Replace("ViewModel", "View", StringComparison.Ordinal);
+
+        var viewType = Type.GetType(viewTypeName, throwOnError: false);
+        if (viewType is not null)
         {
-            return (Control)Activator.CreateInstance(type)!;
+            return (Control)Activator.CreateInstance(viewType)!;
         }
-        
-        return new TextBlock { Text = "Not Found: " + name };
+
+        return new TextBlock { Text = "Not Found: " + viewTypeName };
     }
 
     public bool Match(object? data)

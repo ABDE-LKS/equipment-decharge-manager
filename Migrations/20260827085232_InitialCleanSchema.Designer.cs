@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EquipmentDechargeManager.Migrations
 {
     [DbContext(typeof(DechargeDbContext))]
-    [Migration("20260824210618_MergeEquipmentReturn")]
-    partial class MergeEquipmentReturn
+    [Migration("20260827085232_InitialCleanSchema")]
+    partial class InitialCleanSchema
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,6 +34,10 @@ namespace EquipmentDechargeManager.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
                     b.Property<string>("DechargeNumber")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -44,13 +48,23 @@ namespace EquipmentDechargeManager.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("employee_id");
 
-                    b.Property<DateTime>("IssueDate")
-                        .HasColumnType("timestamp with time zone")
+                    b.Property<DateOnly>("IssueDate")
+                        .HasColumnType("date")
                         .HasColumnName("issue_date");
 
                     b.Property<string>("Notes")
                         .HasColumnType("text")
                         .HasColumnName("notes");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("status");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
 
                     b.HasKey("Id")
                         .HasName("pk_decharges");
@@ -74,10 +88,20 @@ namespace EquipmentDechargeManager.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateOnly>("AssignmentDate")
+                        .HasColumnType("date")
+                        .HasColumnName("assignment_date");
+
                     b.Property<string>("ConditionAtAssignment")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("condition_at_assignment");
+
+                    b.Property<string>("ConditionReturned")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("condition_returned");
 
                     b.Property<int>("DechargeId")
                         .HasColumnType("integer")
@@ -87,21 +111,9 @@ namespace EquipmentDechargeManager.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("equipment_id");
 
-                    b.Property<bool>("IsReturned")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_returned");
-
-                    b.Property<string>("ReturnCondition")
-                        .HasColumnType("text")
-                        .HasColumnName("return_condition");
-
-                    b.Property<DateTime?>("ReturnDate")
-                        .HasColumnType("timestamp with time zone")
+                    b.Property<DateOnly?>("ReturnDate")
+                        .HasColumnType("date")
                         .HasColumnName("return_date");
-
-                    b.Property<string>("ReturnNotes")
-                        .HasColumnType("text")
-                        .HasColumnName("return_notes");
 
                     b.HasKey("Id")
                         .HasName("pk_decharge_items");
@@ -110,9 +122,7 @@ namespace EquipmentDechargeManager.Migrations
                         .HasDatabaseName("ix_decharge_items_decharge_id");
 
                     b.HasIndex("EquipmentId")
-                        .IsUnique()
-                        .HasDatabaseName("ix_decharge_items_equipment_id")
-                        .HasFilter("is_returned = false");
+                        .HasDatabaseName("ix_decharge_items_equipment_id");
 
                     b.ToTable("decharge_items", (string)null);
                 });
@@ -179,7 +189,6 @@ namespace EquipmentDechargeManager.Migrations
                         .HasColumnName("brand");
 
                     b.Property<string>("InventoryNumber")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
                         .HasColumnName("inventory_number");
@@ -191,7 +200,6 @@ namespace EquipmentDechargeManager.Migrations
                         .HasColumnName("model");
 
                     b.Property<string>("SerialNumber")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
                         .HasColumnName("serial_number");

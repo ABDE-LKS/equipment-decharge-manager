@@ -11,5 +11,10 @@ public class Employee
     public string Structure { get; set; } = string.Empty;
     public string Region { get; set; } = string.Empty;
 
+    // User-friendly display for lists and dropdowns
+    public string DisplayName => $"{Matricule} — {FullName} — {Function}";
+
+    public override string ToString() => DisplayName;
+
     public ICollection<Decharge> Decharges { get; set; } = new List<Decharge>();
 }

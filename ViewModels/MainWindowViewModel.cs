@@ -1,6 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using EquipmentDechargeManager.Services;
 
 namespace EquipmentDechargeManager.ViewModels;
 
@@ -12,26 +11,40 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private string _activeTab = "Dashboard";
 
-    [ObservableProperty]
-    private string _selectedLanguage = "FR";
+    public bool IsDashboardActive => ActiveTab == "Dashboard";
+    public bool IsEmployeesActive => ActiveTab == "Employees";
+    public bool IsEquipmentActive => ActiveTab == "Equipment";
+    public bool IsHistoryActive => ActiveTab == "History";
+    public bool IsDechargesActive => ActiveTab == "Decharges";
+    public bool IsDechargeDetailsActive => ActiveTab == "DechargeDetails";
+    public bool IsSettingsActive => ActiveTab == "Settings";
 
-    public LocalizationManager Loc => LocalizationManager.Instance;
+    partial void OnActiveTabChanged(string value)
+    {
+        OnPropertyChanged(nameof(IsDashboardActive));
+        OnPropertyChanged(nameof(IsEmployeesActive));
+        OnPropertyChanged(nameof(IsEquipmentActive));
+        OnPropertyChanged(nameof(IsHistoryActive));
+        OnPropertyChanged(nameof(IsDechargesActive));
+        OnPropertyChanged(nameof(IsDechargeDetailsActive));
+        OnPropertyChanged(nameof(IsSettingsActive));
+    }
+
+
 
     public MainWindowViewModel()
     {
-        Loc.SetCulture("fr");
         var dashboardVm = new DashboardViewModel();
-        dashboardVm.NavigateToDetailsRequested = NavigateToDechargeDetails;
+        dashboardVm.NavigateToDetailsRequested = (id) => NavigateToDechargeDetails(id, false);
         _currentView = dashboardVm;
         _activeTab = "Dashboard";
-        _selectedLanguage = "FR";
     }
 
     [RelayCommand]
     public void NavigateDashboard()
     {
         var dashboardVm = new DashboardViewModel();
-        dashboardVm.NavigateToDetailsRequested = NavigateToDechargeDetails;
+        dashboardVm.NavigateToDetailsRequested = (id) => NavigateToDechargeDetails(id, false);
         CurrentView = dashboardVm;
         ActiveTab = "Dashboard";
     }
@@ -51,20 +64,45 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     [RelayCommand]
+    public void NavigateHistory()
+    {
+        var historyVm = new HistoryViewModel();
+        historyVm.NavigateToDetailsRequested = (id) => NavigateToDechargeDetails(id, false);
+        CurrentView = historyVm;
+        ActiveTab = "History";
+    }
+
+    [RelayCommand]
     public void NavigateDecharges()
     {
         var dechargesVm = new DechargesViewModel();
-        dechargesVm.NavigateToDetailsRequested = NavigateToDechargeDetails;
+        dechargesVm.NavigateToDetailsRequested = (id, openReturnModal) => NavigateToDechargeDetails(id, openReturnModal);
         CurrentView = dechargesVm;
         ActiveTab = "Decharges";
     }
 
-    public void NavigateToDechargeDetails(int dechargeId)
+    public void NavigateToDechargeDetails(int dechargeId, bool openReturnModal = false)
     {
-        var detailsVm = new DechargeDetailsViewModel(dechargeId);
+        var detailsVm = new DechargeDetailsViewModel(dechargeId, openReturnModal);
         detailsVm.BackRequested = NavigateDecharges;
+        detailsVm.ViewEmployeeRequested = NavigateToEmployee;
+        detailsVm.ViewEquipmentRequested = NavigateToEquipment;
         CurrentView = detailsVm;
         ActiveTab = "DechargeDetails";
+    }
+
+    public void NavigateToEmployee(int employeeId, string matricule)
+    {
+        var vm = new EmployeesViewModel(matricule);
+        CurrentView = vm;
+        ActiveTab = "Employees";
+    }
+
+    public void NavigateToEquipment(int equipmentId, string inventoryNumber)
+    {
+        var vm = new EquipmentViewModel(inventoryNumber);
+        CurrentView = vm;
+        ActiveTab = "Equipment";
     }
 
     [RelayCommand]
@@ -72,19 +110,5 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         CurrentView = new SettingsViewModel();
         ActiveTab = "Settings";
-    }
-
-    [RelayCommand]
-    public void SetFrench()
-    {
-        SelectedLanguage = "FR";
-        Loc.SetCulture("fr");
-    }
-
-    [RelayCommand]
-    public void SetEnglish()
-    {
-        SelectedLanguage = "EN";
-        Loc.SetCulture("en");
     }
 }

@@ -15,8 +15,6 @@ public partial class SettingsViewModel : ViewModelBase
     public DataImportWizardViewModel EmployeeWizard { get; }
     public DataImportWizardViewModel EquipmentWizard { get; }
 
-    public LocalizationManager Loc => LocalizationManager.Instance;
-
     public SettingsViewModel()
     {
         EmployeeWizard = new DataImportWizardViewModel(ImportEntityType.Employee);

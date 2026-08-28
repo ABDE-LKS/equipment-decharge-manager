@@ -11,6 +11,7 @@ public static class PdfService
     static PdfService()
     {
         QuestPDF.Settings.License = LicenseType.Community;
+        QuestPDF.Settings.EnableDebugging = true;
     }
 
     public static byte[] GeneratePdfBytes(Decharge decharge, string? logoPath = null)

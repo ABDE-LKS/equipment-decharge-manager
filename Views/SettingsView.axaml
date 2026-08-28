@@ -11,20 +11,20 @@
     <Grid RowDefinitions="Auto, *">
         
         <!-- Settings Header & Navigation Tab Bar -->
-        <Border Grid.Row="0" Background="White" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1" Padding="24,16">
+        <Border Grid.Row="0" Margin="20,16,20,12" Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="4" Padding="16,12">
             <DockPanel>
-                <StackPanel DockPanel.Dock="Left" Spacing="4">
-                    <TextBlock Text="Paramètres &amp; Importation de Données" FontSize="20" FontWeight="Bold" Foreground="#0F172A"/>
-                    <TextBlock Text="Importer vos listes d'employés et d'équipements existantes en masse" FontSize="12" Foreground="#64748B"/>
+                <StackPanel DockPanel.Dock="Left" Spacing="2" VerticalAlignment="Center">
+                    <TextBlock Text="Paramètres &amp; Importation de Données" FontSize="18" FontWeight="Bold" Foreground="#111827"/>
+                    <TextBlock Text="Importation en masse des listes d'employés et d'équipements depuis des fichiers Excel / CSV" FontSize="12" Foreground="#6B7280"/>
                 </StackPanel>
 
-                <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="8">
-                    <Button Content="👥 Importer des Employés" 
+                <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                    <Button Content="👥 Importer Employés" 
                             Command="{Binding SelectEmployeesImportCommand}" 
-                            Classes="outline" Padding="14,8"/>
-                    <Button Content="💻 Importer des Équipements" 
+                            Classes="outline" Padding="12,6" CornerRadius="4"/>
+                    <Button Content="💻 Importer Équipements" 
                             Command="{Binding SelectEquipmentImportCommand}" 
-                            Classes="outline" Padding="14,8"/>
+                            Classes="outline" Padding="12,6" CornerRadius="4"/>
                 </StackPanel>
             </DockPanel>
         </Border>

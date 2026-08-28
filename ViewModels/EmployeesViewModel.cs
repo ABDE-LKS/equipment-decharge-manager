@@ -19,7 +19,7 @@ public partial class EmployeesViewModel : ViewModelBase
     [ObservableProperty]
     private string _searchText = string.Empty;
 
-    // Form Properties
+    // Form Properties (Add / Edit)
     [ObservableProperty]
     private bool _isFormOpen;
 
@@ -44,15 +44,34 @@ public partial class EmployeesViewModel : ViewModelBase
     [ObservableProperty]
     private string _region = string.Empty;
 
+    // Delete Confirmation Modal Properties
+    [ObservableProperty]
+    private bool _isDeleteConfirmOpen;
+
+    [ObservableProperty]
+    private Employee? _employeeToDelete;
+
+    [ObservableProperty]
+    private int _relatedDechargeCount;
+
+    [ObservableProperty]
+    private bool _canDeleteEmployee;
+
     [ObservableProperty]
     private string _errorMessage = string.Empty;
 
-    public LocalizationManager Loc => LocalizationManager.Instance;
+    [ObservableProperty]
+    private string _successMessage = string.Empty;
 
-    public EmployeesViewModel()
+    public EmployeesViewModel(string? initialSearch = null)
     {
+        if (!string.IsNullOrWhiteSpace(initialSearch))
+            SearchText = initialSearch;
+
         _ = LoadEmployeesAsync();
     }
+
+    partial void OnSearchTextChanged(string value) => _ = LoadEmployeesAsync();
 
     [RelayCommand]
     public async Task LoadEmployeesAsync()
@@ -65,7 +84,7 @@ public partial class EmployeesViewModel : ViewModelBase
             if (!string.IsNullOrWhiteSpace(SearchText))
             {
                 string term = SearchText.Trim().ToLower();
-                query = query.Where(e => e.FullName.ToLower().Contains(term) || e.Matricule.ToLower().Contains(term));
+                query = query.Where(e => e.FullName.ToLower().Contains(term) || e.Matricule.ToLower().Contains(term) || e.Structure.ToLower().Contains(term));
             }
 
             var list = await query.OrderBy(e => e.FullName).ToListAsync();
@@ -81,13 +100,14 @@ public partial class EmployeesViewModel : ViewModelBase
     public void OpenAddForm()
     {
         EditingEmployeeId = null;
-        FormTitle = Loc["Emp_AddTitle"];
+        FormTitle = "Ajouter un employé";
         FullName = string.Empty;
         Matricule = string.Empty;
         Function = string.Empty;
         Structure = string.Empty;
         Region = string.Empty;
         ErrorMessage = string.Empty;
+        SuccessMessage = string.Empty;
         IsFormOpen = true;
     }
 
@@ -96,13 +116,14 @@ public partial class EmployeesViewModel : ViewModelBase
     {
         if (employee == null) return;
         EditingEmployeeId = employee.Id;
-        FormTitle = Loc["Emp_EditTitle"];
+        FormTitle = "Modifier l'employé";
         FullName = employee.FullName;
         Matricule = employee.Matricule;
         Function = employee.Function;
         Structure = employee.Structure;
         Region = employee.Region;
         ErrorMessage = string.Empty;
+        SuccessMessage = string.Empty;
         IsFormOpen = true;
     }
 
@@ -118,7 +139,7 @@ public partial class EmployeesViewModel : ViewModelBase
     {
         if (string.IsNullOrWhiteSpace(FullName) || string.IsNullOrWhiteSpace(Matricule))
         {
-            ErrorMessage = Loc["Common_Required"];
+            ErrorMessage = "Champ obligatoire";
             return;
         }
 
@@ -133,7 +154,7 @@ public partial class EmployeesViewModel : ViewModelBase
 
             if (exists)
             {
-                ErrorMessage = Loc["Emp_ErrorMatriculeExists"];
+                ErrorMessage = "Ce matricule existe déjà.";
                 return;
             }
 
@@ -164,6 +185,7 @@ public partial class EmployeesViewModel : ViewModelBase
 
             await db.SaveChangesAsync();
             IsFormOpen = false;
+            SuccessMessage = $"✓ Employé {FullName.Trim()} enregistré avec succès";
             await LoadEmployeesAsync();
         }
         catch (Exception ex)
@@ -173,23 +195,60 @@ public partial class EmployeesViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    public async Task DeleteEmployeeAsync(Employee employee)
+    public async Task OpenDeleteConfirmationAsync(Employee employee)
     {
         if (employee == null) return;
+
+        EmployeeToDelete = employee;
+        ErrorMessage = string.Empty;
+        SuccessMessage = string.Empty;
+
         try
         {
             using var db = DatabaseInitializer.CreateDbContext();
-            var emp = await db.Employees.FindAsync(employee.Id);
+            // Check if employee has any ACTIVE décharge
+            int activeDechargeCount = await db.Decharges.CountAsync(d => d.EmployeeId == employee.Id && d.Status == "ACTIVE");
+            CanDeleteEmployee = activeDechargeCount == 0;
+            IsDeleteConfirmOpen = true;
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Impossible de vérifier les décharges associées : " + ex.Message;
+        }
+    }
+
+    [RelayCommand]
+    public void CancelDeleteConfirmation()
+    {
+        IsDeleteConfirmOpen = false;
+        EmployeeToDelete = null;
+        ErrorMessage = string.Empty;
+    }
+
+    [RelayCommand]
+    public async Task ConfirmDeleteEmployeeAsync()
+    {
+        if (EmployeeToDelete == null || !CanDeleteEmployee) return;
+
+        try
+        {
+            using var db = DatabaseInitializer.CreateDbContext();
+            var emp = await db.Employees.FindAsync(EmployeeToDelete.Id);
             if (emp != null)
             {
+                string empName = emp.FullName;
                 db.Employees.Remove(emp);
                 await db.SaveChangesAsync();
+
+                IsDeleteConfirmOpen = false;
+                EmployeeToDelete = null;
+                SuccessMessage = $"✓ Employé '{empName}' supprimé avec succès";
                 await LoadEmployeesAsync();
             }
         }
         catch (Exception ex)
         {
-            ErrorMessage = ex.Message;
+            ErrorMessage = "Erreur lors de la suppression : " + ex.Message;
         }
     }
 }

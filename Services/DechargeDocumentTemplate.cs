@@ -4,6 +4,7 @@ using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using System;
 using System.IO;
+using System.Text;
 
 namespace EquipmentDechargeManager.Services;
 
@@ -18,7 +19,6 @@ public class DechargeDocumentTemplate : IDocument
         _logoPath = logoPath ?? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "sonatrach_logo.png");
         if (!File.Exists(_logoPath))
         {
-            // Fallback to project root Assets folder if BaseDirectory path doesn't exist
             string projectLogo = Path.Combine(Directory.GetCurrentDirectory(), "Assets", "sonatrach_logo.png");
             if (File.Exists(projectLogo))
             {
@@ -36,7 +36,7 @@ public class DechargeDocumentTemplate : IDocument
             page.Size(PageSizes.A4);
             page.Margin(36);
             page.PageColor(Colors.White);
-            page.DefaultTextStyle(x => x.FontSize(10).FontFamily("Arial"));
+            page.DefaultTextStyle(x => x.FontSize(11).FontFamily("Times New Roman"));
 
             page.Header().Element(ComposeHeader);
             page.Content().Element(ComposeContent);
@@ -46,184 +46,171 @@ public class DechargeDocumentTemplate : IDocument
 
     private void ComposeHeader(IContainer container)
     {
-        container.Row(row =>
+        container.PaddingBottom(6).Row(row =>
         {
-            // Logo on the left
-            row.ConstantItem(140).Height(50).Element(logoContainer =>
+            // Logo on the left - LARGER SIZE
+            row.ConstantItem(120).MaxHeight(80).Element(logoContainer =>
             {
                 if (!string.IsNullOrEmpty(_logoPath) && File.Exists(_logoPath))
                 {
-                    logoContainer.Image(_logoPath);
+                    logoContainer.MaxHeight(80).MaxWidth(120).Image(_logoPath).FitArea();
                 }
                 else
                 {
-                    logoContainer.Text("SONATRACH").FontSize(14).Bold().FontColor(Colors.Orange.Darken2);
+                    logoContainer.Text("SONATRACH").FontSize(16).Bold().FontColor(Colors.Black);
                 }
             });
 
-            // Center Organizational Hierarchy
+            // Organizational Hierarchy - aligned to the left
             row.RelativeItem().Column(col =>
             {
-                col.Item().AlignCenter().Text("EXPLORATION PRODUCTION").FontSize(9).Bold();
-                col.Item().AlignCenter().Text("DIVISION PRODUCTION").FontSize(9).Bold();
-                col.Item().AlignCenter().Text("DIRECTION REGIONALE HASSI R'MEL").FontSize(9).Bold();
-                col.Item().AlignCenter().Text("DIRECTION INFORMATIQUE").FontSize(9).Bold();
+                col.Spacing(1);
+                col.Item().AlignLeft().Text("EXPLORATION PRODUCTION").FontSize(9.5f).Bold();
+                col.Item().AlignLeft().Text("DIVISION PRODUCTION").FontSize(9.5f).Bold();
+                col.Item().AlignLeft().Text("DIRECTION REGIONALE").FontSize(9.5f).Bold();
+                col.Item().AlignLeft().Text("HASSI R'MEL").FontSize(9.5f).Bold();
+                col.Item().AlignLeft().Text("DIRECTION INFORMATIQUE").FontSize(9.5f).Bold();
             });
-
-            // Blank spacer on right for balance
-            row.ConstantItem(100);
         });
     }
 
     private void ComposeContent(IContainer container)
     {
-        container.PaddingVertical(15).Column(col =>
+        container.PaddingVertical(10).Column(col =>
         {
-            col.Spacing(15);
+            col.Spacing(12);
 
-            // Title Box
-            col.Item().AlignCenter().Column(titleCol =>
+            // Title
+            col.Item().PaddingTop(10).AlignCenter().Text("DECHARGE").FontSize(22).Bold().FontColor(Colors.Black);
+
+            // Declaration opener
+            col.Item().PaddingTop(6).Text("Je soussigné,").FontSize(11.5f);
+
+            // Employee fields
+            col.Item().Column(empCol =>
             {
-                titleCol.Item().Text("DÉCHARGE").FontSize(20).Bold().FontColor(Colors.Blue.Darken3).LetterSpacing(0.1f);
-                titleCol.Item().PaddingTop(4).Text($"N° : {_decharge.DechargeNumber}  |  Date : {_decharge.IssueDate:dd/MM/yyyy}").FontSize(11).Medium();
-            });
+                empCol.Spacing(7);
 
-            // Employee Section Box
-            col.Item().Border(1).BorderColor(Colors.Grey.Lighten1).Padding(12).Column(empCol =>
-            {
-                empCol.Spacing(6);
-                empCol.Item().Text("INFORMATIONS DU BÉNÉFICIAIRE").FontSize(11).Bold().FontColor(Colors.Blue.Darken3);
-
-                empCol.Item().Row(row =>
+                empCol.Item().Text(t =>
                 {
-                    row.RelativeItem().Text(t =>
-                    {
-                        t.Span("Nom et Prénom : ").Bold();
-                        t.Span(_decharge.Employee?.FullName ?? "N/A");
-                    });
-                    row.RelativeItem().Text(t =>
-                    {
-                        t.Span("Matricule : ").Bold();
-                        t.Span(_decharge.Employee?.Matricule ?? "N/A");
-                    });
+                    t.DefaultTextStyle(x => x.FontSize(11.5f));
+                    t.Span("NOM & PRENOM : ").Bold();
+                    t.Span(_decharge.Employee?.FullName ?? "N/A");
                 });
 
-                empCol.Item().Row(row =>
+                empCol.Item().Text(t =>
                 {
-                    row.RelativeItem().Text(t =>
-                    {
-                        t.Span("Fonction : ").Bold();
-                        t.Span(_decharge.Employee?.Function ?? "N/A");
-                    });
-                    row.RelativeItem().Text(t =>
-                    {
-                        t.Span("Structure : ").Bold();
-                        t.Span(_decharge.Employee?.Structure ?? "N/A");
-                    });
+                    t.DefaultTextStyle(x => x.FontSize(11.5f));
+                    t.Span("MATRICULE : ").Bold();
+                    t.Span(_decharge.Employee?.Matricule ?? "N/A");
                 });
 
-                empCol.Item().Row(row =>
+                empCol.Item().Text(t =>
                 {
-                    row.RelativeItem().Text(t =>
-                    {
-                        t.Span("Région : ").Bold();
-                        t.Span(_decharge.Employee?.Region ?? "N/A");
-                    });
+                    t.DefaultTextStyle(x => x.FontSize(11.5f));
+                    t.Span("FONCTION : ").Bold();
+                    t.Span(_decharge.Employee?.Function ?? "N/A");
+                });
+
+                empCol.Item().Text(t =>
+                {
+                    t.DefaultTextStyle(x => x.FontSize(11.5f));
+                    t.Span("STRUCTURE : ").Bold();
+                    t.Span(_decharge.Employee?.Structure ?? "N/A");
+                });
+
+                empCol.Item().Text(t =>
+                {
+                    t.DefaultTextStyle(x => x.FontSize(11.5f));
+                    t.Span("REGION : ").Bold();
+                    t.Span(_decharge.Employee?.Region ?? "N/A");
                 });
             });
 
-            // Equipment Table Section
-            col.Item().Column(eqCol =>
+            // Loan Declaration Heading
+            col.Item().PaddingTop(4).Column(declCol =>
             {
-                eqCol.Item().PaddingBottom(6).Text("ÉQUIPEMENTS ASSIGNÉS").FontSize(11).Bold().FontColor(Colors.Blue.Darken3);
+                declCol.Spacing(2);
+                declCol.Item().Text("Avoir reçu, à titre de prêt, ce jour le matériel suivant :").FontSize(11.5f);
+                declCol.Item().Text("(Indiquer marque, type, N° de série, N° Inventaire)").FontSize(9.5f).Italic();
+            });
 
-                eqCol.Item().Table(table =>
+            // Equipment list — plain bulleted list
+            col.Item().PaddingTop(2).Column(eqCol =>
+            {
+                eqCol.Spacing(6);
+
+                foreach (var item in _decharge.Items)
                 {
-                    table.ColumnsDefinition(columns =>
+                    var eq = item.Equipment;
+                    string designation = eq != null ? $"{eq.Type} {eq.Brand} {eq.Model}".Trim() : "Équipement";
+                    while (designation.Contains("  ")) designation = designation.Replace("  ", " ");
+
+                    bool hasDetails = eq != null && (
+                        !string.IsNullOrWhiteSpace(eq.ShCode) ||
+                        !string.IsNullOrWhiteSpace(eq.SerialNumber) ||
+                        !string.IsNullOrWhiteSpace(eq.InventoryNumber));
+
+                    if (hasDetails)
                     {
-                        columns.ConstantColumn(30);   // N°
-                        columns.RelativeColumn(3);    // Designation / Type
-                        columns.RelativeColumn(2);    // N° Serie
-                        columns.RelativeColumn(2);    // N° Inventaire
-                        columns.RelativeColumn(1.5f); // Code SH
-                        columns.RelativeColumn(2);    // Condition
-                    });
+                        eqCol.Item().Text(t =>
+                        {
+                            t.DefaultTextStyle(x => x.FontSize(11.5f));
+                            t.Span("- 01 ");
+                            t.Span(designation + ",").Bold();
+                        });
 
-                    // Table Header
-                    table.Header(header =>
-                    {
-                        header.Cell().Background(Colors.Grey.Lighten2).Border(1).BorderColor(Colors.Grey.Medium).Padding(4).AlignCenter().Text("N°").Bold();
-                        header.Cell().Background(Colors.Grey.Lighten2).Border(1).BorderColor(Colors.Grey.Medium).Padding(4).Text("Équipement / Modèle").Bold();
-                        header.Cell().Background(Colors.Grey.Lighten2).Border(1).BorderColor(Colors.Grey.Medium).Padding(4).Text("N° Série").Bold();
-                        header.Cell().Background(Colors.Grey.Lighten2).Border(1).BorderColor(Colors.Grey.Medium).Padding(4).Text("N° Inventaire").Bold();
-                        header.Cell().Background(Colors.Grey.Lighten2).Border(1).BorderColor(Colors.Grey.Medium).Padding(4).Text("Code SH").Bold();
-                        header.Cell().Background(Colors.Grey.Lighten2).Border(1).BorderColor(Colors.Grey.Medium).Padding(4).Text("État").Bold();
-                    });
+                        var details = new StringBuilder();
+                        var parts = new System.Collections.Generic.List<string>();
+                        if (!string.IsNullOrWhiteSpace(eq!.ShCode))
+                            parts.Add($"Code SH : {eq.ShCode}");
+                        if (!string.IsNullOrWhiteSpace(eq.SerialNumber))
+                            parts.Add($"N° de série : {eq.SerialNumber}");
+                        if (!string.IsNullOrWhiteSpace(eq.InventoryNumber))
+                            parts.Add($"N° inv. : {eq.InventoryNumber}");
+                        details.Append(string.Join(", ", parts));
+                        details.Append('.');
 
-                    int index = 1;
-                    foreach (var item in _decharge.Items)
-                    {
-                        var eq = item.Equipment;
-                        string title = eq != null ? $"{eq.Type} {eq.Brand} {eq.Model}".Trim() : "Équipement";
-                        string serial = eq?.SerialNumber ?? "-";
-                        string inv = eq?.InventoryNumber ?? "-";
-                        string sh = eq?.ShCode ?? "-";
-                        string cond = item.ConditionAtAssignment ?? "Bon";
-
-                        table.Cell().Border(1).BorderColor(Colors.Grey.Lighten1).Padding(5).AlignCenter().Text($"{index:D2}");
-                        table.Cell().Border(1).BorderColor(Colors.Grey.Lighten1).Padding(5).Text(title).Medium();
-                        table.Cell().Border(1).BorderColor(Colors.Grey.Lighten1).Padding(5).Text(serial);
-                        table.Cell().Border(1).BorderColor(Colors.Grey.Lighten1).Padding(5).Text(inv);
-                        table.Cell().Border(1).BorderColor(Colors.Grey.Lighten1).Padding(5).Text(sh);
-                        table.Cell().Border(1).BorderColor(Colors.Grey.Lighten1).Padding(5).Text(cond);
-
-                        index++;
+                        eqCol.Item().PaddingLeft(14).Text(details.ToString()).FontSize(11.5f).Bold();
                     }
-                });
+                    else
+                    {
+                        eqCol.Item().Text($"- 01 {designation}.").FontSize(11.5f);
+                    }
+                }
             });
 
-            // Notes / Remarks if present
-            if (!string.IsNullOrWhiteSpace(_decharge.Notes))
+            // Signatures block
+            col.Item().Element(ComposeSignatures);
+        });
+    }
+
+    private void ComposeSignatures(IContainer container)
+    {
+        container.PaddingTop(200).Row(row =>
+        {
+            row.RelativeItem().Column(sig =>
             {
-                col.Item().Border(1).BorderColor(Colors.Grey.Lighten2).Padding(8).Column(notesCol =>
-                {
-                    notesCol.Item().Text("OBSERVATIONS :").Bold().FontSize(9);
-                    notesCol.Item().Text(_decharge.Notes).FontSize(9).Italic();
-                });
-            }
+                sig.Item().Text("Le CEDANT (Nom et signature)").FontSize(11);
+                sig.Item().MinHeight(30);
+            });
 
-            // Signatures Section
-            col.Item().PaddingTop(20).Row(row =>
+            row.RelativeItem().Column(sig =>
             {
-                row.RelativeItem().Border(1).BorderColor(Colors.Grey.Lighten1).Padding(10).Height(90).Column(sig =>
-                {
-                    sig.Item().AlignCenter().Text("LE CÉDANT").Bold().FontSize(10);
-                    sig.Item().AlignCenter().Text("(Nom, Prénom & Signature)").FontSize(8).Italic().FontColor(Colors.Grey.Darken1);
-                });
+                sig.Item().AlignCenter().Text("Le PRENEUR").FontSize(11);
+                sig.Item().MinHeight(30);
+            });
 
-                row.ConstantItem(20);
-
-                row.RelativeItem().Border(1).BorderColor(Colors.Grey.Lighten1).Padding(10).Height(90).Column(sig =>
-                {
-                    sig.Item().AlignCenter().Text("LE PRENEUR").Bold().FontSize(10);
-                    sig.Item().AlignCenter().Text("(Nom, Prénom & Signature)").FontSize(8).Italic().FontColor(Colors.Grey.Darken1);
-                });
+            row.RelativeItem().Column(sig =>
+            {
+                sig.Item().AlignRight().Text($"Le {_decharge.IssueDate:dd/MM/yyyy}").FontSize(11);
+                sig.Item().MinHeight(30);
             });
         });
     }
 
     private void ComposeFooter(IContainer container)
     {
-        container.Row(row =>
-        {
-            row.RelativeItem().Text("Document généré par Equipment Decharge Manager").FontSize(8).FontColor(Colors.Grey.Medium);
-            row.RelativeItem().AlignRight().Text(t =>
-            {
-                t.Span("Page ");
-                t.CurrentPageNumber();
-                t.Span(" sur ");
-                t.TotalPages();
-            });
-        });
+        // Footer is intentionally left empty
     }
 }

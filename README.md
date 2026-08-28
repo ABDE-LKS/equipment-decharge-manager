@@ -1,231 +1,364 @@
-# 🖥️ Equipment Decharge Manager
 
-A Windows desktop application for managing **equipment discharge forms (Décharges)** used at **Sonatrach — Direction Informatique, Hassi R'Mel**.
+# Equipment Décharge Manager
 
-Built with **C# / .NET 10**, **Avalonia UI**, **MVVM architecture**, and **PostgreSQL**.
+This project is a desktop application for managing equipment loans and returns, built with Avalonia UI and Entity Framework Core with PostgreSQL.
 
----
+It lets the user:
+- manage employees
+- manage equipment inventory
+- create and track equipment decharges
+- mark returned equipment
+- view history and dashboard summaries
+- print/export documents
+- import equipment records from CSV/Excel
 
-## 📋 Features
 
-- **Dashboard** — Statistics overview of employees, equipment, and décharges
-- **Employee Management** — Full CRUD with search and filtering
-- **Equipment Management** — Inventory tracking with status management
-- **Décharge Management** — Create, view, and manage equipment discharge forms
-- **Décharge PDF Generation & Printing** — Generate official A4 PDF documents with the Sonatrach header, then preview, print, or save
-- **Data Import** — Bulk import employees and equipment from Excel (.xlsx) or CSV files via a guided wizard
-- **Bilingual UI** — French (default) and English
+## 1. Project architecture
 
----
+The solution is organized by responsibility:
 
-## ⚙️ Prerequisites
+- `Views/` → UI screens and controls
+- `ViewModels/` → presentation logic and commands
+- `Data/` → EF Core context and entities
+- `Services/` → database init, localization, import, PDF/print, settings
+- `Resources/` → translations for French/English
+- `Models/` → shared model-like objects if used by the app
+- `Migrations/` → EF Core generated database change history
+- `Assets/` and `Resources/` → icons, images, strings
+- `installer/` → packaging outputs
 
-Before you begin, install the following on your machine:
 
-| Tool | Version | Download |
-|------|---------|----------|
-| **.NET SDK** | 10.0 or later | https://dotnet.microsoft.com/download/dotnet/10.0 |
-| **Docker Desktop** | Latest | https://www.docker.com/products/docker-desktop/ |
-| **Git** | Latest | https://git-scm.com/downloads |
+## 2. Application startup
 
-> **Note:** Docker is required to run the PostgreSQL database. If you prefer to install PostgreSQL directly (without Docker), see the [Manual PostgreSQL Setup](#-manual-postgresql-setup-without-docker) section below.
+The app starts in `Program.cs`.
 
----
+What happens:
+- it creates a single-instance mutex so only one app instance runs
+- it calls `BuildAvaloniaApp()`
+- then starts the Avalonia desktop lifetime
 
-## 🚀 Setup Guide (Step-by-Step)
+The app root is configured in `App.axaml` and `App.axaml.cs`.
 
-### 1. Clone the Repository
 
-```bash
-git clone https://github.com/YOUR_USERNAME/equipment-decharge-manager.git
-cd equipment-decharge-manager
-```
+## 3. Main window and navigation
 
-### 2. Start the PostgreSQL Database
+The main navigation is handled by `MainWindowViewModel`.
 
-Make sure **Docker Desktop is running**, then execute:
+Important points:
+- `CurrentView` holds the active screen view model
+- `ActiveTab` tracks the current tab/page name
+- navigation methods switch the app from Dashboard, Employees, Equipment, History, Decharges, Details, Settings
 
-```bash
-docker-compose up -d
-```
+Example:
+- `NavigateDashboard()` loads `DashboardViewModel`
+- `NavigateEmployees()` loads `EmployeesViewModel`
+- `NavigateEquipment()` loads `EquipmentViewModel`
+- `NavigateDecharges()` loads `DechargesViewModel`
+- `NavigateToDechargeDetails(...)` opens `DechargeDetailsViewModel`
 
-This creates a PostgreSQL 16 container with:
+This creates a single-screen navigation system where the content area changes depending on the active tab.
 
-| Parameter | Value |
-|-----------|-------|
-| Host | `127.0.0.1` |
-| Port | `5435` |
-| Database | `dechargedb` |
-| Username | `decharge_user` |
-| Password | `decharge_password` |
 
-To verify the container is running:
+## 4. ViewModel pattern
 
-```bash
-docker ps
-```
+The app follows MVVM.
 
-You should see `equipment_decharge_postgres` in the list.
+Each screen has:
+- a `ViewModel` class in `ViewModels/`
+- a matching `.axaml` view in `Views/`
+- a code-behind file in `Views/...axaml.cs` (usually just initializing the view)
 
-### 3. Restore NuGet Packages
+Example:
+- `DashboardViewModel` + `DashboardView.axaml`
+- `EmployeesViewModel` + `EmployeesView.axaml`
+- `EquipmentViewModel` + `EquipmentView.axaml`
+- `DechargesViewModel` + `DechargesView.axaml`
+- `DechargeDetailsViewModel` + `DechargeDetailsView.axaml`
 
-```bash
-dotnet restore
-```
+The `CommunityToolkit.Mvvm` library is used for:
+- `[ObservableProperty]` for reactive properties
+- `[RelayCommand]` for button actions and command handlers
 
-### 4. Apply Database Migrations
+This keeps the UI layer thin and logic centralized in the view models.
 
-The project uses **Entity Framework Core** migrations to create the database schema automatically.
 
-Install the EF Core CLI tool (one-time):
+## 5. Data layer
 
-```bash
-dotnet tool install --global dotnet-ef
-```
+The database access layer is defined in `Data/`.
 
-Then apply all migrations:
+### `DechargeDbContext`
+This is the EF Core context. It configures:
+- `Employees`
+- `Equipments`
+- `Decharges`
+- `DechargeItems`
 
-```bash
-dotnet ef database update
-```
+It sets:
+- primary keys
+- unique indexes
+- required fields
+- relationships between entities
 
-This will create all the tables: `employees`, `equipments`, `decharges`, `decharge_items`, `equipment_returns`.
+### `DechargeDbContextFactory`
+This helps create the database context for design-time or factory-based use.
 
-### 5. Build the Application
+### Entities
+In `Data/Entities/`:
+- `Employee.cs`
+- `Equipment.cs`
+- `Decharge.cs`
+- `DechargeItem.cs`
 
-```bash
-dotnet build
-```
+These classes represent the database model and are mapped to PostgreSQL tables.
 
-### 6. Run the Application
 
-```bash
-dotnet run
-```
+## 6. Domain model
 
-The application window will open. You're ready to go! 🎉
+### Employee
+Represents a staff member receiving equipment.
+Properties usually include:
+- FullName
+- Matricule
+- Function
+- Structure
+- Region
 
----
+### Equipment
+Represents a physical asset in inventory.
+Properties include:
+- Type
+- Brand
+- Model
+- SerialNumber
+- InventoryNumber
+- ShCode
+- Status
 
-## 📁 Project Structure
+Status is commonly one of:
+- Available
+- Assigned
 
-```
-Equipment Decharge Manager/
-├── Assets/                        → Images & logos (sonatrach_logo.png)
-├── Data/
-│   ├── Entities/                  → EF Core entity classes
-│   ├── DechargeDbContext.cs       → Database context & model configuration
-│   └── DechargeDbContextFactory.cs → Design-time factory for EF migrations
-├── Migrations/                    → EF Core database migrations
-├── MarkupExtensions/              → Avalonia XAML helpers
-├── Models/                        → Display / DTO models
-├── Resources/                     → Localization files (Strings.resx, .fr, .en)
-├── Services/
-│   ├── DatabaseInitializer.cs     → DB connection & auto-migration at startup
-│   ├── DechargeDocumentTemplate.cs → QuestPDF A4 layout template
-│   ├── PdfService.cs              → PDF compilation service
-│   ├── PrintService.cs            → Windows printing integration
-│   ├── ExcelCsvReader.cs          → Excel/CSV file parser
-│   └── DataImportService.cs       → Bulk import validation & DB insertion
-├── ViewModels/                    → MVVM ViewModels (application logic)
-├── Views/                         → Avalonia XAML views (UI)
-├── docker-compose.yml             → PostgreSQL container definition
-├── schema.dbml                    → Database schema documentation
-└── EquipmentDechargeManager.csproj → Project file & NuGet dependencies
-```
+### Decharge
+Represents the loan of equipment to an employee.
+Properties include:
+- DechargeNumber
+- EmployeeId
+- IssueDate
+- Status
+- Notes
 
----
+### DechargeItem
+Represents one item inside a decharge.
+It links:
+- a decharge
+- a specific equipment
+- assignment state
+- return date
+- return condition
 
-## 🗄️ Manual PostgreSQL Setup (Without Docker)
 
-If you don't want to use Docker, install PostgreSQL directly:
+## 7. Database configuration and initialization
 
-1. Download and install **PostgreSQL 16+** from https://www.postgresql.org/download/
-2. During installation, note the port (default `5432`)
-3. Open **pgAdmin** or **psql** and create the database and user:
+The database connection settings are in `appsettings.json` and `appsettings.example.json`.
 
-```sql
-CREATE USER decharge_user WITH PASSWORD 'decharge_password';
-CREATE DATABASE dechargedb OWNER decharge_user;
-GRANT ALL PRIVILEGES ON DATABASE dechargedb TO decharge_user;
-```
+Typical configuration:
+- host
+- port
+- database name
+- username
+- password
 
-4. Update the connection string in these two files to match your setup (change port from `5435` to `5432` if needed):
+`Services/DatabaseConfiguration.cs` and `Services/DatabaseInitializer.cs` handle database startup and ensuring the DB exists.
 
-   - [`Data/DechargeDbContextFactory.cs`](Data/DechargeDbContextFactory.cs) — Line 13
-   - [`Services/DatabaseInitializer.cs`](Services/DatabaseInitializer.cs) — Line 12
+The project uses migrations in the `Migrations/` folder, generated by EF Core. These track schema changes over time.
 
-```
-Host=127.0.0.1;Port=5432;Database=dechargedb;Username=decharge_user;Password=decharge_password
-```
 
-5. Then continue with [Step 4: Apply Database Migrations](#4-apply-database-migrations).
+## 8. Dashboard
 
----
+`DashboardViewModel` loads summary statistics:
+- total equipment
+- available equipment
+- assigned equipment
+- total employees
+- total decharges
+- active items
+- recent decharges list
 
-## 🛠️ Useful Commands
+The dashboard is meant to give a quick overview of the current state of the inventory and operations.
 
-| Action | Command |
-|--------|---------|
-| Start database | `docker-compose up -d` |
-| Stop database | `docker-compose down` |
-| Stop database & delete data | `docker-compose down -v` |
-| Build project | `dotnet build` |
-| Run project | `dotnet run` |
-| Add a new EF migration | `dotnet ef migrations add MigrationName` |
-| Apply migrations | `dotnet ef database update` |
-| Check .NET version | `dotnet --version` |
 
----
+## 9. Equipment page
 
-## 📦 NuGet Dependencies
+`EquipmentViewModel` handles:
+- load list of equipment
+- search by text
+- filter by status
+- open add/edit form
+- save equipment records
+- delete equipment
 
-| Package | Purpose |
-|---------|---------|
-| **Avalonia** (12.1.1) | Cross-platform UI framework |
-| **Avalonia.Desktop** | Windows desktop host |
-| **Avalonia.Themes.Fluent** | Modern Fluent design theme |
-| **CommunityToolkit.Mvvm** | MVVM source generators & commands |
-| **Npgsql.EntityFrameworkCore.PostgreSQL** | PostgreSQL EF Core provider |
-| **EFCore.NamingConventions** | Snake_case column naming |
-| **QuestPDF** | A4 PDF document generation |
-| **ClosedXML** | Excel .xlsx file reading |
-| **CsvHelper** | CSV file parsing |
+Important validation rules:
+- Type, Brand, Model are required
+- Serial number and inventory number are optional but unique if provided
+- equipment cannot be deleted if it is currently attached to an active decharge
 
----
+The `EquipmentView.axaml` file renders the table and the side form used to add/edit equipment.
 
-## ⚠️ Troubleshooting
 
-### Build fails with "file is locked"
-Kill any running instance of the app first:
-```powershell
-taskkill /F /IM EquipmentDechargeManager.exe
-dotnet build
-```
+## 10. Employee page
 
-### Database connection refused
-Make sure Docker is running and the container is up:
-```bash
-docker-compose up -d
-docker ps
-```
+`EmployeesViewModel` handles:
+- listing employees
+- filtering by search text
+- create/edit employee records
+- unique matricule validation
+- delete employee
 
-### EF tool not found
-Install it globally:
-```bash
-dotnet tool install --global dotnet-ef
-```
+This is much simpler than the equipment flow because employees are mostly a master data table.
 
-### Port 5435 already in use
-Either stop the conflicting service or change the port in `docker-compose.yml`:
-```yaml
-ports:
-  - "5436:5432"   # Change 5435 to another port
-```
-Then update the connection strings in the code to match.
 
----
+## 11. Decharge creation and tracking
 
-## 📄 License
+`DechargesViewModel` contains most of the business flow for creating and editing a decharge.
 
-Internal use — Sonatrach Direction Informatique.
+Main responsibilities:
+- load active decharges
+- search decharges
+- select an employee
+- search available equipment
+- add equipment to a working list
+- confirm creation
+- save decharge to database
+- update equipment status to Assigned
+
+It uses a two-step flow:
+1. user selects employee and equipment
+2. user confirms the creation before the database is updated
+
+The selected equipment is stored in `SelectedEquipmentItems`, and each item can have an assignment condition like `Neuf`.
+
+When a decharge is saved:
+- a new `Decharge` record is created
+- one `DechargeItem` is created per selected equipment
+- each linked equipment status is changed to `Assigned`
+
+
+## 12. Decharge details and return flow
+
+`DechargeDetailsViewModel` is the most important operational screen after a decharge is created.
+
+It loads:
+- decharge metadata
+- employee info
+- list of assigned items
+- return dates and conditions
+
+It can:
+- display the full decharge details
+- open a return modal
+- record return date and condition
+- save equipment return
+- update equipment status back to Available
+- update decharge status to Returned
+- print or generate PDF outputs
+
+This is the flow where the “return” process happens.
+
+
+## 13. History page
+
+`HistoryViewModel` is used to review past operations.
+
+It typically loads:
+- completed or historical decharges
+- equipment return history
+- previous assignments and return conditions
+
+This is useful for audit and tracking of asset movement over time.
+
+
+## 14. Services
+
+The `Services/` folder contains cross-cutting logic.
+
+Common services:
+- `DatabaseInitializer.cs` — initializes database + schema
+- `DatabaseConfiguration.cs` — database configuration
+- `LocalizationManager.cs` — removed (project is French only)
+- `SettingsService.cs` — app settings persistence
+- `DataImportService.cs` — imports equipment from CSV/Excel-like sources
+- `ExcelCsvReader.cs` — reads import files
+- `PrintService.cs` and `PdfService.cs` — print/export functionality
+- `DechargeDocumentTemplate.cs` — builds printable decharge documents
+
+These services keep the view models focused on UI behavior instead of infrastructure details.
+
+
+## 15. Localization
+
+The app supports multiple languages using `Resources/`:
+All strings are hardcoded in French.
+
+This is why the app can switch between French and English in the main window.
+
+
+## 16. How the app works end-to-end
+
+A normal user flow looks like this:
+
+1. The app starts in `Program.cs`.
+2. `MainWindowViewModel` loads the dashboard.
+3. The user navigates to the Employees or Equipment pages.
+4. The user adds employees or equipment using the form panels.
+5. The user creates a decharge from the Decharges screen.
+6. The selected equipment is assigned and saved in the database.
+7. Later, the user opens the decharge details and clicks return.
+8. The return modal records the return date and condition.
+9. Each equipment returns to Available status.
+10. The decharge status changes to Returned.
+11. History and dashboard summaries update automatically.
+
+
+## 17. Data flow pattern
+
+Most view models follow a repeatable pattern:
+
+- property binds to UI
+- `Load...Async()` queries the database
+- user modifies form fields
+- commands call save logic
+- save logic updates EF entities and `SaveChangesAsync()`
+- UI refreshes by reloading the list
+
+This makes the app work in a predictable way and keeps the data flow easy to follow.
+
+
+## 18. Main files to understand first
+
+If you want to understand the project quickly, read these first:
+
+- `Program.cs`
+- `ViewModels/MainWindowViewModel.cs`
+- `Data/DechargeDbContext.cs`
+- `Data/Entities/Equipment.cs`
+- `Data/Entities/Decharge.cs`
+- `Data/Entities/DechargeItem.cs`
+- `ViewModels/EquipmentViewModel.cs`
+- `ViewModels/DechargesViewModel.cs`
+- `ViewModels/DechargeDetailsViewModel.cs`
+- `Views/EquipmentView.axaml`
+- `Views/DechargesView.axaml`
+- `Views/DechargeDetailsView.axaml`
+
+
+## 19. Summary
+
+This project is a classic MVVM desktop application:
+- `Views` handle presentation
+- `ViewModels` handle commands and state
+- `Data` handles EF Core entities and database access
+- `Services` handle cross-cutting tasks
+- `Resources` handle language localization
+- `Migrations` keep the database schema versioned
+
+The app is designed to manage the full lifecycle of equipment loans: registration, assignment, return, and historical tracking.

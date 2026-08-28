@@ -1,3 +1,4 @@
+using EquipmentDechargeManager.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
@@ -9,10 +10,7 @@ public class DechargeDbContextFactory : IDesignTimeDbContextFactory<DechargeDbCo
     {
         var optionsBuilder = new DbContextOptionsBuilder<DechargeDbContext>();
 
-        string connectionString = System.Environment.GetEnvironmentVariable("DATABASE_URL")
-            ?? "Host=127.0.0.1;Port=5435;Database=dechargedb;Username=decharge_user;Password=decharge_password";
-
-        optionsBuilder.UseNpgsql(connectionString)
+        optionsBuilder.UseNpgsql(DatabaseConfiguration.GetConnectionString())
                       .UseSnakeCaseNamingConvention();
 
         return new DechargeDbContext(optionsBuilder.Options);

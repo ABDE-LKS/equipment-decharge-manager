@@ -87,3 +87,6 @@ $RECYCLE.BIN/
 
 # Gemini / Antigravity working directories
 .gemini/
+
+# Local database credentials (copy from appsettings.example.json)
+appsettings.json

@@ -10,53 +10,128 @@
 
     <Application.Styles>
         <FluentTheme />
-        
-        <!-- Primary Accent Button -->
+
+        <!-- Global Font Defaults: Segoe UI Enterprise Font -->
+        <Style Selector="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe UI, -apple-system, BlinkMacSystemFont, Arial, sans-serif"/>
+        </Style>
+        <Style Selector="TextBox">
+            <Setter Property="FontFamily" Value="Segoe UI, -apple-system, BlinkMacSystemFont, Arial, sans-serif"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="BorderBrush" Value="#D1D5DB"/>
+        </Style>
+        <Style Selector="ComboBox">
+            <Setter Property="FontFamily" Value="Segoe UI, -apple-system, BlinkMacSystemFont, Arial, sans-serif"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="BorderBrush" Value="#D1D5DB"/>
+        </Style>
+        <Style Selector="DatePicker">
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="BorderBrush" Value="#D1D5DB"/>
+        </Style>
+
+        <!-- Primary Accent Button (Windows Blue) -->
         <Style Selector="Button.accent">
             <Setter Property="Background" Value="#2563EB"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="CornerRadius" Value="6"/>
-            <Setter Property="Padding" Value="14,8"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
         </Style>
 
-        <!-- Outline Button -->
+        <!-- Secondary Outline Button -->
         <Style Selector="Button.outline">
             <Setter Property="Background" Value="White"/>
-            <Setter Property="Foreground" Value="#334155"/>
-            <Setter Property="BorderBrush" Value="#CBD5E1"/>
+            <Setter Property="Foreground" Value="#374151"/>
+            <Setter Property="BorderBrush" Value="#D1D5DB"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="FontWeight" Value="Medium"/>
-            <Setter Property="CornerRadius" Value="6"/>
-            <Setter Property="Padding" Value="12,7"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+        <!-- Danger Button -->
+        <Style Selector="Button.danger">
+            <Setter Property="Background" Value="#DC2626"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="Cursor" Value="Hand"/>
         </Style>
 
         <!-- Action Icon Buttons -->
         <Style Selector="Button.icon-edit">
-            <Setter Property="Background" Value="#EFF6FF"/>
+            <Setter Property="Background" Value="#F3F4F6"/>
             <Setter Property="Foreground" Value="#2563EB"/>
-            <Setter Property="BorderBrush" Value="#BFDBFE"/>
+            <Setter Property="BorderBrush" Value="#D1D5DB"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="4"/>
-            <Setter Property="Padding" Value="8,5"/>
+            <Setter Property="Padding" Value="6,4"/>
+            <Setter Property="Cursor" Value="Hand"/>
         </Style>
-        
+
         <Style Selector="Button.icon-delete">
             <Setter Property="Background" Value="#FEF2F2"/>
-            <Setter Property="Foreground" Value="#EF4444"/>
-            <Setter Property="BorderBrush" Value="#FECACA"/>
+            <Setter Property="Foreground" Value="#DC2626"/>
+            <Setter Property="BorderBrush" Value="#FCA5A5"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="4"/>
-            <Setter Property="Padding" Value="8,5"/>
+            <Setter Property="Padding" Value="6,4"/>
+            <Setter Property="Cursor" Value="Hand"/>
         </Style>
 
         <Style Selector="Button.icon-view">
-            <Setter Property="Background" Value="#F8FAFC"/>
-            <Setter Property="Foreground" Value="#475569"/>
-            <Setter Property="BorderBrush" Value="#E2E8F0"/>
+            <Setter Property="Background" Value="#F9FAFB"/>
+            <Setter Property="Foreground" Value="#374151"/>
+            <Setter Property="BorderBrush" Value="#D1D5DB"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="4"/>
-            <Setter Property="Padding" Value="8,5"/>
+            <Setter Property="Padding" Value="6,4"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+        <!-- Sidebar Navigation Buttons -->
+        <Style Selector="Button.nav-btn">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#9CA3AF"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+        <Style Selector="Button.nav-btn.active">
+            <Setter Property="Background" Value="#1E293B"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+
+        <!-- Success / Restitution Button -->
+        <Style Selector="Button.success">
+            <Setter Property="Background" Value="#059669"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="14,8"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+
+        <!-- Preset Chip Option Buttons -->
+        <Style Selector="Button.preset-chip">
+            <Setter Property="Background" Value="#F3F4F6"/>
+            <Setter Property="Foreground" Value="#374151"/>
+            <Setter Property="BorderBrush" Value="#D1D5DB"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="CornerRadius" Value="16"/>
+            <Setter Property="Padding" Value="12,5"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Cursor" Value="Hand"/>
         </Style>
 
     </Application.Styles>
